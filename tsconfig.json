@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "target": "es2017",
+    "outDir": "lib",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "services": ["./services"],
+      "services/*": ["./services/*"],
+      "lib": ["./lib"],
+      "lib/*": ["./lib/*"],
+      "utils": ["./utils"],
+      "utils/*": ["./utils/*"]
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,38 @@
+service:
+  name: kremen-cinema
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
+  iamRoleStatements:
+    - Effect: Allow
+      Resource: "arn:aws:lambda:us-east-1:*:*"
+      Action:
+        - lambda:*
+
+functions:
+  bot:
+    handler: handlerBot.handler
+    timeout: 10
+    environment:
+      NODE_ENV: ${self:provider.stage}
+      BOT_TOKEN: ${file(config.${self:provider.stage}.json):BOT_TOKEN}
+      ADMIN_TOKEN: ${file(config.${self:provider.stage}.json):ADMIN_TOKEN}
+      CACHE_ENABLED: ${file(config.${self:provider.stage}.json):CACHE_ENABLED}
+      REDIS_HOST: ${file(config.${self:provider.stage}.json):REDIS_HOST}
+      REDIS_PORT: ${file(config.${self:provider.stage}.json):REDIS_PORT}
+      REDIS_PASS: ${file(config.${self:provider.stage}.json):REDIS_PASS}
+    events:
+      - http:
+          method: post
+          path: bot/handler
+          cors: true
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: true
+          input:
+            action: checkForNew
