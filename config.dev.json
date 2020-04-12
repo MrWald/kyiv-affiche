@@ -1,0 +1,8 @@
+{
+  "BOT_TOKEN": "1221809085:AAG0ynzVsLPOYEVJ3qw2yhAC4RdC40PCppg",
+  "CACHE_ENABLED": false,
+  "REDIS_HOST": "127.0.0.1",
+  "REDIS_PORT": 6379,
+  "REDIS_PASS": "",
+  "ADMIN_TOKEN": ""
+}
