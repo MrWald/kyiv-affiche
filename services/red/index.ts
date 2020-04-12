@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 import { Log } from '../../utils';
 const log = Log('redis');
-const config = require(__dirname + '/config.' + process.env.NODE_ENV);
+const config = require('../../config.' + process.env.NODE_ENV);
 export const projectKey = `cinemas:${process.env.NODE_ENV}`;
 
 export const redisClient = createClient({

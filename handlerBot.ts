@@ -2,7 +2,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import Bot from './services/bot';
 import { Log, okResp } from './utils';
 const log = Log('cinemas.handler');
-const config = require(__dirname + '/config.' + process.env.NODE_ENV);
+const config = require('./config.' + process.env.NODE_ENV);
 
 const BOT_TOKEN = config.BOT_TOKEN;
 if (!BOT_TOKEN) {
