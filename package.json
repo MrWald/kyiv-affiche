@@ -1,7 +1,7 @@
 {
   "name": "kyiv-theatres-affiche",
   "version": "1.0.0",
-  "main": "handlerBit.ts",
+  "main": "handlerBot.ts",
   "license": "MIT",
   "scripts": {
     "dev": "tsc -w --skipLibCheck",
