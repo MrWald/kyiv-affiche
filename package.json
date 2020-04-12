@@ -1,13 +1,14 @@
 {
   "name": "kyiv-theatres-affiche",
   "version": "1.0.0",
-  "main": "handler.js",
+  "main": "handlerBit.ts",
   "license": "MIT",
   "scripts": {
     "dev": "tsc -w --skipLibCheck",
     "dist": "tsc --skipLibCheck",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "lint": "tslint --fix -e node_modules"
+    "lint": "tslint --fix -e node_modules",
+    "start": "NODE_ENV=dev ts-node handlerBot.ts"
   },
   "dependencies": {
     "aws-sdk": "2.395.0",
