@@ -1,13 +1,13 @@
 import { createClient } from 'redis';
 import { Log } from '../../utils';
 const log = Log('redis');
-const { env: { REDIS_HOST, REDIS_PORT, REDIS_PASS, NODE_ENV } } = process;
-export const projectKey = `cinemas:${NODE_ENV}`;
+const config = require(__dirname + '/config.' + process.env.NODE_ENV);
+export const projectKey = `cinemas:${process.env.NODE_ENV}`;
 
 export const redisClient = createClient({
-  host: REDIS_HOST,
-  password: REDIS_PASS,
-  port: parseInt(REDIS_PORT, 10),
+  host: config.REDIS_HOST,
+  password: config.REDIS_PASS,
+  port: parseInt(config.REDIS_PORT, 10),
   retry_strategy: (options) => {
     if (options.error && options.error.code === 'ECONNREFUSED') {
         return new Error('The server refused the connection');
