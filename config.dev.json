@@ -1,7 +1,7 @@
 {
   "BOT_TOKEN": "1221809085:AAG0ynzVsLPOYEVJ3qw2yhAC4RdC40PCppg",
   "CACHE_ENABLED": false,
-  "REDIS_HOST": "redis://h:p83745a37097d560a09339c8bdc2ccb37198fcee85213e5c72507d87cbf191196@ec2-63-35-150-77.eu-west-1.compute.amazonaws.com",
+  "REDIS_HOST": "h:p83745a37097d560a09339c8bdc2ccb37198fcee85213e5c72507d87cbf191196@ec2-63-35-150-77.eu-west-1.compute.amazonaws.com",
   "REDIS_PORT": 10049,
   "REDIS_PASS": "",
   "ADMIN_TOKEN": ""
