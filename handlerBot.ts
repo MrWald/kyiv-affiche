@@ -10,7 +10,7 @@ if (!BOT_TOKEN) {
   process.exit(1);
 }
 
-const cacheEnabled = (config.CACHE_ENABLED === "false") || (config.CACHE_ENABLED === "0") ? false : true;
+const cacheEnabled = config.CACHE_ENABLED;
 log.debug(cacheEnabled ? 'cache enabled' : 'cache disabled');
 const bot = new Bot(BOT_TOKEN, cacheEnabled);
 
