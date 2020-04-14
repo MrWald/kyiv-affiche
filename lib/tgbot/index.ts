@@ -1,5 +1,5 @@
-import { asyncReq } from '../../utils';
-import { ITGSendMessageOpt, ITGSendMessageReducedOpt } from './types';
+import { asyncReq } from 'utils';
+import { ITGSendMessageOpt, ITGSendMessageReducedOpt } from 'lib/tgbot/types';
 
 const asyncReqData = async (opt) => {
   const { response, data: body } = await asyncReq(opt);

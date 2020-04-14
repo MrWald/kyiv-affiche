@@ -1,4 +1,4 @@
-import { Log } from '../../utils';
+import { Log } from 'utils';
 const log = Log('redis');
 const config = require('../../config.' + process.env.NODE_ENV);
 export const projectKey = `cinemas:${process.env.NODE_ENV}`;

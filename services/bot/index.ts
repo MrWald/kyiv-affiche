@@ -1,18 +1,18 @@
 import TelegramBot, {
   ITGMessage, ITGSendMessageReducedOpt, ITGUpdate, strFromBotCmd, TGChatId,
-} from '../../lib/tgbot';
+} from 'lib/tgbot';
 import { isArray } from 'lodash';
-import { getCache, setCache } from '../cache';
-import { Log } from '../../utils';
-import { adminLogin, adminLogout, isAdmin } from './admin';
-import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from './chatsStore';
-import { cinemsDataToMsg, getCinemasData, moviesListFromCinemasData } from './cinemas';
-import { addToNotifiedMovies, filterNotNotifiedMovies } from './moviesStore';
+import { getCache, setCache } from 'services/cache';
+import { Log } from 'utils';
+import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
+import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
+import { cinemsDataToMsg, getCinemasData, moviesListFromCinemasData } from 'services/bot/cinemas';
+import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
   serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg,
-} from './msg';
-import { EStatsEvent, logEvent, statsMsgForPeriod } from './stats';
+} from 'services/bot/msg';
+import { EStatsEvent, logEvent, statsMsgForPeriod } from 'services/bot/stats';
 const log = Log('cinemas.bot');
 
 const ScheduleCacheKey = 'schedule';

@@ -1,7 +1,7 @@
 import { compact, reduce, sortBy, uniq } from 'lodash';
 import moment from 'moment';
-import { asyncReq, Log, RN, RN2 } from '../../utils';
-import { ICinema, ICinemaSession } from './types';
+import { asyncReq, Log, RN, RN2 } from 'utils';
+import { ICinema, ICinemaSession } from 'services/bot/types';
 const log = Log('cinemas.cinemas');
 
 export const getCinemasData = async (): Promise<ICinema[]> => {

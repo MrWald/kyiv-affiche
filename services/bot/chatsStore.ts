@@ -1,5 +1,5 @@
-import { TGChatId } from '../../lib/tgbot';
-import { projectKey, sadd, sdiff, smembers, srem  } from '../red';
+import { TGChatId } from 'lib/tgbot';
+import { projectKey, sadd, sdiff, smembers, srem  } from 'services/red';
 const rootKey = `${projectKey}:chats`;
 
 export const addToAllGroup = (chatId: TGChatId) => addToGroup(chatId, 'all');

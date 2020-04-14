@@ -1,6 +1,9 @@
 service:
   name: kyiv-affiche
 
+org: w260698 
+app: my-first-app
+
 plugins:
   - serverless-webpack
 
@@ -23,11 +26,13 @@ functions:
       BOT_TOKEN: ${file(config.${self:provider.stage}.json):BOT_TOKEN}
       ADMIN_TOKEN: ${file(config.${self:provider.stage}.json):ADMIN_TOKEN}
       CACHE_ENABLED: ${file(config.${self:provider.stage}.json):CACHE_ENABLED}
-      REDIS_HOST: ${file(config.${self:provider.stage}.json):REDIS_HOST}
-      REDIS_PORT: ${file(config.${self:provider.stage}.json):REDIS_PORT}
-      REDIS_PASS: ${file(config.${self:provider.stage}.json):REDIS_PASS}
+      REDIS_URL: ${file(config.${self:provider.stage}.json):REDIS_URL}
     events:
       - http:
+          method: post
+          path: bot/handler
+          cors: true
+      - https:
           method: post
           path: bot/handler
           cors: true

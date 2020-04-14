@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import Bot from './services/bot';
-import { Log, okResp } from './utils';
+import Bot from 'services/bot';
+import { Log, okResp } from 'utils';
 const log = Log('cinemas.handler');
 const config = require('./config.' + process.env.NODE_ENV);
 

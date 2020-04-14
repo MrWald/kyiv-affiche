@@ -1,4 +1,4 @@
-import { projectKey, sadd, sismember } from '../red';
+import { projectKey, sadd, sismember } from 'services/red';
 const rootKey = `${projectKey}:movies`;
 
 export const addToNotifiedMovies = async (movies: string[]) => (
