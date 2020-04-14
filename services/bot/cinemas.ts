@@ -1,12 +1,12 @@
-import { compact, reduce, sortBy, uniq } from 'lodash';
+import { reduce, sortBy, uniq } from 'lodash';
 import moment from 'moment';
 import { asyncReq, Log, RN, RN2 } from 'utils';
-import { ICinema, ICinemaSession } from 'services/bot/types';
+import { ITheatre } from 'services/bot/types';
 const log = Log('cinemas.cinemas');
 
-export const getCinemasData = async (): Promise<ICinema[]> => {
+export const getCinemasData = async (): Promise<ITheatre[]> => {
   log.debug('getting cinemas data');
-  const { data } = await asyncReq<ICinema[]>({
+  const { data } = await asyncReq<ITheatre[]>({
     url: 'https://ewom32k72a.execute-api.us-east-1.amazonaws.com/dev/cinemas',
     json: true,
   });
@@ -15,22 +15,22 @@ export const getCinemasData = async (): Promise<ICinema[]> => {
   return data;
 };
 
-export const moviesListFromCinemasData = (cinemas: ICinema[]): string[] => {
+export const moviesListFromCinemasData = (cinemas: ITheatre[]): string[] => {
   const res: string[] = [];
   for (const cinema of cinemas) {
-    for (const movie of cinema.movies) {
-      res.push(movie.title.local);
+    for (const movie of cinema.performances) {
+      res.push(movie.name);
     }
   }
   return uniq(res);
 };
 
-const moviePriorityFromCinemas = (title: string, cinemas: ICinema[]): number => {
+const moviePriorityFromCinemas = (title: string, cinemas: ITheatre[]): number => {
   let sessionsCount = 0;
   for (const cinema of cinemas) {
-    const movie = cinema.movies.find((item) => item.title.local === title);
+    const movie = cinema.performances.find((item) => item.name === title);
     if (movie) {
-      sessionsCount += movie.sessions.length;
+      sessionsCount += movie.dates.length;
     }
   }
   return sessionsCount;
@@ -43,7 +43,7 @@ interface IMoviesMsg {
   msg: string;
 }
 
-export const cinemsDataToMsg = (cinemas: ICinema[]): string => {
+export const cinemsDataToMsg = (cinemas: ITheatre[]): string => {
   const titles = moviesListFromCinemasData(cinemas);
   const moviesMsg: IMoviesMsg[] = [];
   for (const title of titles) {
@@ -59,7 +59,7 @@ export const cinemsDataToMsg = (cinemas: ICinema[]): string => {
   ), '');
 };
 
-const getMovieMsg = (title: string, cinemas: ICinema[]): string | null => {
+const getMovieMsg = (title: string, cinemas: ITheatre[]): string | null => {
   if (!title) { return null; }
   let str = `🍿 *${title}*`;
   for (const cinema of cinemas) {
@@ -69,29 +69,20 @@ const getMovieMsg = (title: string, cinemas: ICinema[]): string | null => {
   return str;
 };
 
-const cinemaToMovieMsg = (title: string, cinema: ICinema): string | null => {
-  const { title: cTitle, movies: cMovies } = cinema;
-  const movie = cMovies.find((item) => item.title.local === title);
+const cinemaToMovieMsg = (title: string, cinema: ITheatre): string | null => {
+  const { name: cTitle, performances: cMovies } = cinema;
+  const movie = cMovies.find((item) => item.name === title);
   if (!movie) { return null; }
-  const { sessions } = movie;
-  const str = sessionToStr(sessions);
+  const { dates } = movie;
+  const str = sessionToStr(dates);
   if (!str) { return null; }
-  const formats = sessionsToFormatStr(sessions);
-  return !formats ? `🎥 ${cTitle}${RN}${str}` : `🎥 ${cTitle} (${formats})${RN}${str}`;
+  return `🎥 ${cTitle}${RN}${str}`;
 };
 
-const sessionsToFormatStr = (sessions: ICinemaSession[]): string | null => {
-  if (!sessions.length) { return null; }
-  const formats = uniq(compact(sessions.map((item) => (item.format ? item.format.toUpperCase() : item.format))));
-  if (!formats.length) { return null; }
-  const sortFormats = formats.sort((a, b) => a > b ? 1 : -1);
-  return reduce(sortFormats, (memo, str) => (memo ? `${memo}/${str}` : str),  '');
-};
-
-const sessionToStr = (sessions: ICinemaSession[]): string => {
+const sessionToStr = (sessions: string[]): string => {
   let str: string = '';
-  const sortItems = sortBy(sessions, ({date}) => new Date(date).getTime());
-  const strItems = uniq(sortItems.map(({ date }) => dateStrToTime(date)));
+  const sortItems = sortBy(sessions, (date) => new Date(date).getTime());
+  const strItems = uniq(sortItems.map((date) => dateStrToTime(date)));
   for (const item of strItems) {
     str = str ? `${str}, \`${item}\`` : `\`${item}\``;
   }
