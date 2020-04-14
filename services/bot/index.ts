@@ -6,14 +6,14 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { cinemsDataToMsg, getCinemasData, moviesListFromCinemasData } from 'services/bot/cinemas';
+import { cinemsDataToMsg, getCinemasData, moviesListFromCinemasData } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
   serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg,
 } from 'services/bot/msg';
 import { EStatsEvent, logEvent, statsMsgForPeriod } from 'services/bot/stats';
-const log = Log('cinemas.bot');
+const log = Log('theatres.bot');
 
 const ScheduleCacheKey = 'schedule';
 const ScheduleCacheExp = 60 * 60;

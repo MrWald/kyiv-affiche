@@ -2,15 +2,15 @@ import { reduce, sortBy, uniq } from 'lodash';
 import moment from 'moment';
 import { asyncReq, Log, RN, RN2 } from 'utils';
 import { ITheatre } from 'services/bot/types';
-const log = Log('cinemas.cinemas');
+const log = Log('theatres.theatres');
 
 export const getCinemasData = async (): Promise<ITheatre[]> => {
-  log.debug('getting cinemas data');
+  log.debug('getting theatres data');
   const { data } = await asyncReq<ITheatre[]>({
     url: 'https://ewom32k72a.execute-api.us-east-1.amazonaws.com/dev/cinemas',
     json: true,
   });
-  log.debug('getting cinemas data done');
+  log.debug('getting theatres data done');
   log.trace('length=', data.length, 'cinemas=', data);
   return data;
 };
