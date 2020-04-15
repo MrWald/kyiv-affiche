@@ -106,7 +106,7 @@ export const cinemsDataToMsg = (cinemas: ITheatre[]): string => {
 
 const getMovieMsg = (title: string, cinemas: ITheatre[]): string | null => {
   if (!title) { return null; }
-  let str = `🍿 *${title}*`;
+  let str = `Вистава: *${title}*`;
   for (const cinema of cinemas) {
     const cStr = cinemaToMovieMsg(title, cinema);
     if (cStr) { str = `${str}${RN2}${cStr}`; }
@@ -121,7 +121,7 @@ const cinemaToMovieMsg = (title: string, cinema: ITheatre): string | null => {
   const { dates } = movie;
   const str = sessionToStr(dates);
   if (!str) { return null; }
-  return `🎥 ${cTitle}${RN}${str}`;
+  return `Де: ${cTitle}${RN}${str}`;
 };
 
 const sessionToStr = (sessions: string[]): string => {
@@ -131,7 +131,7 @@ const sessionToStr = (sessions: string[]): string => {
   for (const item of strItems) {
     str = str ? `${str}, \`${item}\`` : `\`${item}\``;
   }
-  return `🕒 ${str}`;
+  return `Коли: ${str}`;
 };
 
 const dateStrToTime = (val: string) => (

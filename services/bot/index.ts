@@ -163,7 +163,7 @@ export default class CinemaBot {
   // New movies
 
   public async onCheckForNewMovies() {
-    log.debug('checking for new movies');
+    log.debug('checking for new plays');
     const cinemasData = await this.getCachedCinemasData();
     const movies = moviesListFromCinemasData(cinemasData);
     const notNotifiedMovies = await filterNotNotifiedMovies(movies);
@@ -172,11 +172,11 @@ export default class CinemaBot {
       for (const movie of notNotifiedMovies) {
         msg +=  !msg ? `"${movie}"` : `, "${movie}"`;
       }
-      msg = `🔥${msg} вже у кіно! Переглянути розклад: /schedule`;
+      msg = `${msg} у театрі! Переглянути розклад: /schedule`;
       await this.notifySubscrUsersWithMsg(msg);
       await addToNotifiedMovies(notNotifiedMovies);
     } else {
-      log.debug('new movies not found');
+      log.debug('new plays not found');
     }
   }
 
@@ -190,15 +190,15 @@ export default class CinemaBot {
 
   public async getCachedCinemasData() {
     if (!this.cacheEnabled) {
-      log.debug(`cache disabled, loading cinemas data from api`);
+      log.debug(`cache disabled, loading theatres data from api`);
       return getTheatresData();
     }
     const cachedData = await getCache(ScheduleCacheKey);
     if (cachedData && isArray(cachedData) && cachedData.length) {
-      log.debug(`loading cinemas data from cache`);
+      log.debug(`loading theatres data from cache`);
       return cachedData;
     }
-    log.debug(`loading cinemas data from api`);
+    log.debug(`loading theatres data from api`);
     const data = await getTheatresData();
     log.debug(`saving data to cache`);
     setCache(ScheduleCacheKey, data, ScheduleCacheExp);
