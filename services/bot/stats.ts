@@ -10,6 +10,8 @@ export enum EStatsEvent {
   Get = 'get',
   Help = 'help',
   Start = 'start',
+  Theatres = 'theatres',
+  Actors = 'actors',
   Subscribe = 'subscribe',
   Unsubscribe = 'unsubscribe',
 }
