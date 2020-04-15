@@ -1,6 +1,6 @@
 export interface IPerformance {
   n_performance: number;
-  genre: string;
+  genres: string[];
   name: string;
   actions: number;
   max_age: number;
@@ -10,8 +10,8 @@ export interface IPerformance {
   duration: string;
   based_on?: string;
   dates: string[];
-  authors: IWorker[];
-  roles: IRole[];
+  authors: string[];
+  roles: string[];
   photos?: string[];
 }
 
@@ -29,13 +29,14 @@ export interface IWorker {
   biography?: string;
   is_author: boolean;
   awards?: string[];
-  roles: IRole[];
+  roles?: string[];
+  creations?: string[];
 }
 
 export interface IRole {
   n_role: number;
   name: string;
-  actors: IWorker[];
+  actors: string[];
 }
 
 export interface ITheatre {
@@ -48,8 +49,7 @@ export interface ITheatre {
   phone: string;
   opening: string;
   closing: string;
-  source: string;
   doc_link?: string;
   performances: IPerformance[];
-  workers: IWorker[];
+  workers: string[];
 }

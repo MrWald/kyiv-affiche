@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { cinemsDataToMsg, getCinemasData, moviesListFromCinemasData } from 'services/bot/theatres';
+import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -191,7 +191,7 @@ export default class CinemaBot {
   public async getCachedCinemasData() {
     if (!this.cacheEnabled) {
       log.debug(`cache disabled, loading cinemas data from api`);
-      return getCinemasData();
+      return getTheatresData();
     }
     const cachedData = await getCache(ScheduleCacheKey);
     if (cachedData && isArray(cachedData) && cachedData.length) {
@@ -199,7 +199,7 @@ export default class CinemaBot {
       return cachedData;
     }
     log.debug(`loading cinemas data from api`);
-    const data = await getCinemasData();
+    const data = await getTheatresData();
     log.debug(`saving data to cache`);
     setCache(ScheduleCacheKey, data, ScheduleCacheExp);
     return data;
