@@ -23,12 +23,7 @@ con.connect((err) => {
 export const getTheatresData = async (): Promise<ITheatre[]> => {
   log.debug('getting theatres data');
   let data = [];
-  let temp;
-  await con.query("SELECT * FROM 7a9EKOagJL.Theatres;", (err, res) => {
-    if(err)
-      throw err;
-    temp = res;
-  });
+  let temp = await con.query("SELECT * FROM 7a9EKOagJL.Theatres;");
   for (const theatre of temp) {
     data.push(
       {
@@ -140,71 +135,47 @@ const dateStrToTime = (val: string) => (
 // }
 
 const getPhotos = async (n_performance: number): Promise<string[]> => {
-  let data;
-  await con.query("SELECT 7a9EKOagJL.Photogallery.photo FROM 7a9EKOagJL.Photogallery WHERE 7a9EKOagJL.Photogallery.n_performance="+n_performance+";", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
+  return await con.query("SELECT 7a9EKOagJL.Photogallery.photo FROM 7a9EKOagJL.Photogallery WHERE 7a9EKOagJL.Photogallery.n_performance="+n_performance+";");
 }
 
 const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
   let data = [];
-  await con.query("SELECT * FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_theatre="+theatre_id+";", (err, res) => {
-    if(err)
-      throw err;
-    for(const performance of res){
-      data.push({
-        n_performance: performance.n_performance,
-        genres: getGenre(performance.n_performance),
-        name: performance.name,
-        actions: performance.actions,
-        max_age: performance.max_age,
-        language: performance.language,
-        max_price: performance.max_price,
-        min_price: performance.min_price,
-        duration: performance.duration,
-        based_on: performance.based_on,
-        dates: getDates(performance.n_performance),
-        authors: getAuthors(performance.n_performance),
-        roles: getRolesP(performance.n_performance),
-        photos: getPhotos(performance.n_performance)
-      });
-    }
-  });
+  const temp = await con.query("SELECT * FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_theatre="+theatre_id+";");
+  for(const performance of temp){
+    data.push({
+      n_performance: performance.n_performance,
+      genres: await getGenre(performance.n_performance),
+      name: performance.name,
+      actions: performance.actions,
+      max_age: performance.max_age,
+      language: performance.language,
+      max_price: performance.max_price,
+      min_price: performance.min_price,
+      duration: performance.duration,
+      based_on: performance.based_on,
+      dates: await getDates(performance.n_performance),
+      authors: await getAuthors(performance.n_performance),
+      roles: await getRolesP(performance.n_performance),
+      photos: await getPhotos(performance.n_performance)
+    });
+  }
   return data;
 }
 
 const getGenre = async (n_performance: number): Promise<string[]> => {
-  let data;
-  await con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre=(SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+");", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
+  return await con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre=(SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+");");
 }
 
 const getAuthors = async (n_performance: number): Promise<string[]> => {
   let data = [];
-  con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Genres.worker_code IN (SELECT 7a9EKOagJL.Authors_Performance.n_author FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_performance="+n_performance+");", (err, res) => {
-    if(err)
-      throw err;
-    for(const author of res)
+  const temp = await con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Genres.worker_code IN (SELECT 7a9EKOagJL.Authors_Performance.n_author FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_performance="+n_performance+");");
+  for(const author of temp)
       data.push(author.surname+" "+author.name+" "+author.patronymic);
-  });
   return data;
 }
 
 const getDates = async (n_performance: number): Promise<string[]> => {
-  let data;
-  await con.query("SELECT 7a9EKOagJL.Date_Time_Performance.performance_start FROM 7a9EKOagJL.Date_Time_Performance WHERE 7a9EKOagJL.Date_Time_Performance.n_performance="+n_performance+";", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
+  return await con.query("SELECT 7a9EKOagJL.Date_Time_Performance.performance_start FROM 7a9EKOagJL.Date_Time_Performance WHERE 7a9EKOagJL.Date_Time_Performance.n_performance="+n_performance+";");
 }
 
 // const getAwards = (worker_code: number): string[] => {
@@ -218,13 +189,7 @@ const getDates = async (n_performance: number): Promise<string[]> => {
 // }
 
 const getRolesP = async (n_performance: number): Promise<string[]> => {
-  let data;
-  await con.query("SELECT 7a9EKOagJL.Roles.name FROM 7a9EKOagJL.Roles WHERE 7a9EKOagJL.Roles.n_performance="+n_performance+";", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
+  return await con.query("SELECT 7a9EKOagJL.Roles.name FROM 7a9EKOagJL.Roles WHERE 7a9EKOagJL.Roles.n_performance="+n_performance+";");
 }
 
 // const getCreations = (worker_code: number): string[] => {
@@ -239,10 +204,8 @@ const getRolesP = async (n_performance: number): Promise<string[]> => {
 
 const getWorkers = async (theatre_id: number): Promise<string[]> => {
   let data;
-  await con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Workers.theatre_id=" + theatre_id+";", (err, res) => {
-    if(err)
-      throw err;
-    data.push(res[1]+" "+res[0]+" "+res[2]);
-  });
+  const temp = await con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Workers.theatre_id=" + theatre_id+";");
+  for(const worker of temp)
+    data.push(worker.name+" "+worker.surname+" "+worker.patronymic);
   return data;
 }
