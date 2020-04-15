@@ -59,7 +59,7 @@ export default class CinemaBot {
         await this.onScheduleCmd(chatId);
         logEvent(EStatsEvent.Get);
       } else if (text.indexOf('/theatres') === 0) {
-        await this.onSubscribeCmd(chatId);
+        await this.onStartCmd(chatId, text);
         logEvent(EStatsEvent.Theatres);
       } else if (text.indexOf('/actors') === 0) {
         await this.onSubscribeCmd(chatId);

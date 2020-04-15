@@ -19,6 +19,9 @@ module.exports = {
       utils: path.resolve(__dirname, 'utils/'),
     },
   },
+  optimization: {
+    minimize: false
+  },
   output: {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
