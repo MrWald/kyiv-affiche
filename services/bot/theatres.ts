@@ -160,7 +160,7 @@ const getPerformances = (theatre_id: number): IPerformance[] => {
     for(const performance of res){
       data.push({
         n_performance: performance.n_performance,
-        genres: getGenres(performance.n_performance),
+        genres: getGenre(performance.n_performance),
         name: performance.name,
         actions: performance.actions,
         max_age: performance.max_age,
@@ -179,9 +179,9 @@ const getPerformances = (theatre_id: number): IPerformance[] => {
   return data;
 }
 
-const getGenres = (n_performance: number): string[] => {
+const getGenre = (n_performance: number): string[] => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre IN (SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+";", (err, res) => {
+  con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre=(SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+");", (err, res) => {
     if(err)
       throw err;
     data = res;
