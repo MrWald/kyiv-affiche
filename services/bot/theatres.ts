@@ -23,32 +23,29 @@ con.connect((err) => {
 export const getTheatresData = async (): Promise<ITheatre[]> => {
   log.debug('getting theatres data');
   let data = [];
-  con.query("SELECT * FROM 7a9EKOagJL.Theatres;", (err, res) => {
+  let temp;
+  await con.query("SELECT * FROM 7a9EKOagJL.Theatres;", (err, res) => {
     if(err)
       throw err;
-    for (const key in res) {
-      if (res.hasOwnProperty(key)) {
-        const element = res[key];
-        
-        data.push(
-          {
-            theatre_id: element.theatre_id,
-            name: element.name,
-            street: element.street,
-            building: element.building,
-            district: element.district,
-            postal_code: element.postal_code,
-            phone: element.phone,
-            opening: element.opening,
-            closing: element.closing,
-            doc_link: element.doc_link,
-            performances: getPerformances(element.theatre_id),
-            workers: getWorkers(element.theatre_id)
-          });
-      }
-    }
-    data = res;
+    temp = res;
   });
+  for (const theatre of temp) {
+    data.push(
+      {
+        theatre_id: theatre.theatre_id,
+        name: theatre.name,
+        street: theatre.street,
+        building: theatre.building,
+        district: theatre.district,
+        postal_code: theatre.postal_code,
+        phone: theatre.phone,
+        opening: theatre.opening,
+        closing: theatre.closing,
+        doc_link: theatre.doc_link,
+        performances: await getPerformances(theatre.theatre_id),
+        workers: await getWorkers(theatre.theatre_id)
+      });
+  }
   log.debug('getting theatres data done');
   log.trace('length=', data.length, 'cinemas=', data);
   return data;
@@ -142,9 +139,9 @@ const dateStrToTime = (val: string) => (
 //   return data;
 // }
 
-const getPhotos = (n_performance: number): string[] => {
+const getPhotos = async (n_performance: number): Promise<string[]> => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Photogallery.photo FROM 7a9EKOagJL.Photogallery WHERE 7a9EKOagJL.Photogallery.n_performance="+n_performance+";", (err, res) => {
+  await con.query("SELECT 7a9EKOagJL.Photogallery.photo FROM 7a9EKOagJL.Photogallery WHERE 7a9EKOagJL.Photogallery.n_performance="+n_performance+";", (err, res) => {
     if(err)
       throw err;
     data = res;
@@ -152,9 +149,9 @@ const getPhotos = (n_performance: number): string[] => {
   return data;
 }
 
-const getPerformances = (theatre_id: number): IPerformance[] => {
+const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
   let data = [];
-  con.query("SELECT * FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_theatre="+theatre_id+";", (err, res) => {
+  await con.query("SELECT * FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_theatre="+theatre_id+";", (err, res) => {
     if(err)
       throw err;
     for(const performance of res){
@@ -179,9 +176,9 @@ const getPerformances = (theatre_id: number): IPerformance[] => {
   return data;
 }
 
-const getGenre = (n_performance: number): string[] => {
+const getGenre = async (n_performance: number): Promise<string[]> => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre=(SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+");", (err, res) => {
+  await con.query("SELECT 7a9EKOagJL.Genres.name FROM 7a9EKOagJL.Genres WHERE 7a9EKOagJL.Genres.n_genre=(SELECT 7a9EKOagJL.Performances.n_genre FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance="+n_performance+");", (err, res) => {
     if(err)
       throw err;
     data = res;
@@ -189,7 +186,7 @@ const getGenre = (n_performance: number): string[] => {
   return data;
 }
 
-const getAuthors = (n_performance: number): string[] => {
+const getAuthors = async (n_performance: number): Promise<string[]> => {
   let data = [];
   con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Genres.worker_code IN (SELECT 7a9EKOagJL.Authors_Performance.n_author FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_performance="+n_performance+");", (err, res) => {
     if(err)
@@ -200,9 +197,9 @@ const getAuthors = (n_performance: number): string[] => {
   return data;
 }
 
-const getDates = (n_performance: number): string[] => {
+const getDates = async (n_performance: number): Promise<string[]> => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Date_Time_Performance.performance_start FROM 7a9EKOagJL.Date_Time_Performance WHERE 7a9EKOagJL.Date_Time_Performance.n_performance="+n_performance+";", (err, res) => {
+  await con.query("SELECT 7a9EKOagJL.Date_Time_Performance.performance_start FROM 7a9EKOagJL.Date_Time_Performance WHERE 7a9EKOagJL.Date_Time_Performance.n_performance="+n_performance+";", (err, res) => {
     if(err)
       throw err;
     data = res;
@@ -220,9 +217,9 @@ const getDates = (n_performance: number): string[] => {
 //   return data;
 // }
 
-const getRolesP = (n_performance: number): string[] => {
+const getRolesP = async (n_performance: number): Promise<string[]> => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Roles.name FROM 7a9EKOagJL.Roles WHERE 7a9EKOagJL.Roles.n_performance="+n_performance+";", (err, res) => {
+  await con.query("SELECT 7a9EKOagJL.Roles.name FROM 7a9EKOagJL.Roles WHERE 7a9EKOagJL.Roles.n_performance="+n_performance+";", (err, res) => {
     if(err)
       throw err;
     data = res;
@@ -240,9 +237,9 @@ const getRolesP = (n_performance: number): string[] => {
 //   return data;
 // }
 
-const getWorkers = (theatre_id: number): string[] => {
+const getWorkers = async (theatre_id: number): Promise<string[]> => {
   let data;
-  con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Workers.theatre_id=" + theatre_id+";", (err, res) => {
+  await con.query("SELECT 7a9EKOagJL.Workers.name, 7a9EKOagJL.Workers.surname, 7a9EKOagJL.Workers.patronymic FROM 7a9EKOagJL.Workers WHERE 7a9EKOagJL.Workers.theatre_id=" + theatre_id+";", (err, res) => {
     if(err)
       throw err;
     data.push(res[1]+" "+res[0]+" "+res[2]);
