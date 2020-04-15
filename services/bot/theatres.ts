@@ -132,15 +132,15 @@ const dateStrToTime = (val: string) => (
   moment(val).format('HH:mm')
 );
 
-const getTitle = (title_id: number): string => {
-  let data;
-  con.query("SELECT 7a9EKOagJL.Titles.title_name FROM 7a9EKOagJL.Titles WHERE 7a9EKOagJL.Titles.title_id="+title_id+";", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
-}
+// const getTitle = (title_id: number): string => {
+//   let data;
+//   con.query("SELECT 7a9EKOagJL.Titles.title_name FROM 7a9EKOagJL.Titles WHERE 7a9EKOagJL.Titles.title_id="+title_id+";", (err, res) => {
+//     if(err)
+//       throw err;
+//     data = res;
+//   });
+//   return data;
+// }
 
 const getPhotos = (n_performance: number): string[] => {
   let data;
@@ -210,15 +210,15 @@ const getDates = (n_performance: number): string[] => {
   return data;
 }
 
-const getAwards = (worker_code: number): string[] => {
-  let data;
-  con.query("SELECT 7a9EKOagJL.Awards.name FROM 7a9EKOagJL.Awards WHERE 7a9EKOagJL.Awards.worker_n="+worker_code+";", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
-}
+// const getAwards = (worker_code: number): string[] => {
+//   let data;
+//   con.query("SELECT 7a9EKOagJL.Awards.name FROM 7a9EKOagJL.Awards WHERE 7a9EKOagJL.Awards.worker_n="+worker_code+";", (err, res) => {
+//     if(err)
+//       throw err;
+//     data = res;
+//   });
+//   return data;
+// }
 
 const getRolesP = (n_performance: number): string[] => {
   let data;
@@ -230,15 +230,15 @@ const getRolesP = (n_performance: number): string[] => {
   return data;
 }
 
-const getCreations = (worker_code: number): string[] => {
-  let data;
-  con.query("SELECT 7a9EKOagJL.Performances.name FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance IN (SELECT 7a9EKOagJL.Authors_Performance.n_performance FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_author="+worker_code+");", (err, res) => {
-    if(err)
-      throw err;
-    data = res;
-  });
-  return data;
-}
+// const getCreations = (worker_code: number): string[] => {
+//   let data;
+//   con.query("SELECT 7a9EKOagJL.Performances.name FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance IN (SELECT 7a9EKOagJL.Authors_Performance.n_performance FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_author="+worker_code+");", (err, res) => {
+//     if(err)
+//       throw err;
+//     data = res;
+//   });
+//   return data;
+// }
 
 const getWorkers = (theatre_id: number): string[] => {
   let data;
