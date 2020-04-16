@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData } from 'services/bot/theatres';
+import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData, theatresDataToListMsg } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -59,7 +59,7 @@ export default class CinemaBot {
         await this.onScheduleCmd(chatId);
         logEvent(EStatsEvent.Get);
       } else if (text.indexOf('/theatres') === 0) {
-        await this.onStartCmd(chatId, text);
+        await this.onTheatresCmd(chatId);
         logEvent(EStatsEvent.Theatres);
       } else if (text.indexOf('/actors') === 0) {
         await this.onSubscribeCmd(chatId);
@@ -127,6 +127,13 @@ export default class CinemaBot {
     const cinemasData = await this.getCachedCinemasData();
     log.trace(cinemasData);
     const cinemasMsg = cinemsDataToMsg(cinemasData);
+    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+  }
+
+  public async onTheatresCmd(chatId: TGChatId) {
+    const cinemasData = await this.getCachedCinemasData();
+    log.trace(cinemasData);
+    const cinemasMsg = theatresDataToListMsg(cinemasData);
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
