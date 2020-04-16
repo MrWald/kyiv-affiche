@@ -2,5 +2,5 @@
   "BOT_TOKEN": "1221809085:AAG0ynzVsLPOYEVJ3qw2yhAC4RdC40PCppg",
   "CACHE_ENABLED": false,
   "REDIS_URL": "redis://h:p0cb0cba4da686c5a93b3c1bdf3b4b72c3d3a76b40ed572c6e1d95d06e69f4f1c@ec2-52-55-98-249.compute-1.amazonaws.com:13459",
-  "ADMIN_TOKEN": ""
+  "ADMIN_TOKEN": "admin"
 }
