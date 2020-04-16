@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="d2a1cfa1-36cf-4dda-9bcb-80682f842c19" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/bot/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/bot/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/bot/msg.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/bot/msg.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/bot/theatres.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/bot/theatres.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -42,12 +44,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="ts" value="630" />
+          <entry key="ts" value="867" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="TypeScript" value="630" />
+          <entry key="TypeScript" value="867" />
         </counts>
       </usages-collector>
     </session>
@@ -76,11 +78,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/services/bot/index.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2367">
-              <caret line="172" column="37" selection-start-line="172" selection-start-column="37" selection-end-line="172" selection-end-column="37" />
+            <state relative-caret-position="-162">
+              <caret line="64" column="30" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
               <folding>
                 <element signature="e#0#117#0" expanded="true" />
               </folding>
@@ -96,8 +98,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/services/bot/msg.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="54" column="27" selection-start-line="54" selection-start-column="27" selection-end-line="54" selection-end-column="27" />
+            <state relative-caret-position="240">
+              <caret line="16" column="94" selection-start-line="16" selection-start-column="94" selection-end-line="16" selection-end-column="94" />
             </state>
           </provider>
         </entry>
@@ -105,7 +107,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/services/bot/stats.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
+            <state relative-caret-position="-199">
               <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
@@ -114,11 +116,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/services/bot/theatres.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="446">
-              <caret line="248" column="157" selection-start-line="248" selection-start-column="157" selection-end-line="248" selection-end-column="157" />
+            <state relative-caret-position="2295">
+              <caret line="153" column="10" selection-start-line="153" selection-start-column="10" selection-end-line="153" selection-end-column="10" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
@@ -131,6 +133,8 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>🎥</find>
+      <find>getAuthors</find>
+      <find>Ко</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -139,10 +143,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/services/bot/msg.ts" />
         <option value="$PROJECT_DIR$/services/bot/stats.ts" />
-        <option value="$PROJECT_DIR$/services/bot/index.ts" />
         <option value="$PROJECT_DIR$/services/bot/theatres.ts" />
+        <option value="$PROJECT_DIR$/services/bot/msg.ts" />
+        <option value="$PROJECT_DIR$/services/bot/index.ts" />
       </list>
     </option>
   </component>
@@ -236,7 +240,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1586890419529</updated>
-      <workItem from="1586890422962" duration="6931000" />
+      <workItem from="1586890422962" duration="7849000" />
     </task>
     <task id="LOCAL-00001" summary="Merge branch 'master' of github.com:MrWald/kyiv-affiche&#10;&#10;# Please enter a commit message to explain why this merge is necessary,&#10;# especially if it merges an updated upstream into a topic branch.&#10;#&#10;# Lines starting with '#' will be ignored, and an empty message aborts&#10;# the commit.">
       <created>1587046163356</created>
@@ -249,7 +253,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6931000" />
+    <option name="totallyTimeSpent" value="7849000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -271,10 +275,10 @@
       <window_info anchor="bottom" id="TypeScript" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.09391534" />
+      <window_info anchor="bottom" id="Terminal" weight="0.051587302" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32936507" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3298153" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -314,25 +318,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/services/bot/msg.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="54" column="27" selection-start-line="54" selection-start-column="27" selection-end-line="54" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/services/bot/moviesStore.ts">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/services/bot/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2367">
-          <caret line="172" column="37" selection-start-line="172" selection-start-column="37" selection-end-line="172" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#117#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/design/icon.png">
       <provider selected="true" editor-type-id="images" />
@@ -356,9 +343,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/services/bot/theatres.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2295">
+          <caret line="153" column="10" selection-start-line="153" selection-start-column="10" selection-end-line="153" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#46#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/bot/msg.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="94" selection-start-line="16" selection-start-column="94" selection-end-line="16" selection-end-column="94" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/services/bot/stats.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
+        <state relative-caret-position="-199">
           <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
@@ -366,12 +370,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/services/bot/theatres.ts">
+    <entry file="file://$PROJECT_DIR$/services/bot/index.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="248" column="157" selection-start-line="248" selection-start-column="157" selection-end-line="248" selection-end-column="157" />
+        <state relative-caret-position="-162">
+          <caret line="64" column="30" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
           <folding>
-            <element signature="e#0#46#0" expanded="true" />
+            <element signature="e#0#117#0" expanded="true" />
           </folding>
         </state>
       </provider>

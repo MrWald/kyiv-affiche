@@ -51,7 +51,8 @@ export const getTheatresData = async (): Promise<ITheatre[]> => {
         closing: theatre.closing,
         doc_link: theatre.doc_link,
         performances: await getPerformances(theatre.theatre_id),
-        workers: await getWorkers(theatre.theatre_id)
+        workers: await getWorkers(theatre.theatre_id),
+        actors: await getActors(theatre.theatre_id),
       }
     );
   }
@@ -120,7 +121,7 @@ const getMovieMsg = (title: string, cinemas: ITheatre[]): string | null => {
   if (!title) {
     return null;
   }
-  let str = `Вистава: *${title}*`;
+  let str = `🎭Вистава: *${title}*`;
   for (const cinema of cinemas) {
     const cStr = cinemaToMovieMsg(title, cinema);
     if (cStr) {

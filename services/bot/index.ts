@@ -62,7 +62,7 @@ export default class CinemaBot {
         await this.onTheatresCmd(chatId);
         logEvent(EStatsEvent.Theatres);
       } else if (text.indexOf('/actors') === 0) {
-        await this.onSubscribeCmd(chatId);
+        await this.onActorsCmd(chatId);
         logEvent(EStatsEvent.Actors);
       } else if (text.indexOf('/subscribe') === 0) {
         await this.onSubscribeCmd(chatId);
@@ -134,6 +134,13 @@ export default class CinemaBot {
     const cinemasData = await this.getCachedCinemasData();
     log.trace(cinemasData);
     const cinemasMsg = theatresDataToListMsg(cinemasData);
+    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+  }
+
+  public async onActorsCmd(chatId: TGChatId) {
+    const actorsData = await this.getCachedCinemasData();
+    log.trace(actorsData);
+    const cinemasMsg = theatresDataToListMsg(actorsData);
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
