@@ -56,13 +56,13 @@ export default class CinemaBot {
         await this.onHelpCmd(chatId);
         logEvent(EStatsEvent.Help);
       } else if (text.indexOf('/schedule') === 0) {
-        await this.onScheduleCmd(chatId);
+        await this.onScheduleCmd(chatId, text);
         logEvent(EStatsEvent.Get);
       } else if (text.indexOf('/theatres') === 0) {
         await this.onTheatresCmd(chatId);
         logEvent(EStatsEvent.Theatres);
       } else if (text.indexOf('/actors') === 0) {
-        await this.onActorsCmd(chatId);
+        await this.onActorsCmd(chatId, text);
         logEvent(EStatsEvent.Actors);
       } else if (text.indexOf('/subscribe') === 0) {
         await this.onSubscribeCmd(chatId);
@@ -76,6 +76,12 @@ export default class CinemaBot {
         await this.onStatsCmd(chatId, text);
       } else if (text.indexOf('/logout') === 0) {
         await this.onLogoutCmd(chatId);
+      } else if (text.indexOf('/photos') === 0) {
+        await this.onPhotosCmd(chatId, text);
+      } else if (text.indexOf('/info') === 0) {
+        await this.onInfoCmd(chatId, text);
+      } else if (text.indexOf('/schedule_genres') === 0) {
+        await this.onScheduleGenreCmd(chatId);
       } else {
         await this.sendMsg(chatId, sorryMsg);
       }
@@ -123,7 +129,32 @@ export default class CinemaBot {
     await this.sendMsg(chatId, helpMsg, {disable_web_page_preview: true});
   }
 
-  public async onScheduleCmd(chatId: TGChatId) {
+  //TODO
+  public async onScheduleCmd(chatId: TGChatId, text: string) {
+    const cinemasData = await this.getCachedCinemasData();
+    log.trace(cinemasData);
+    const cinemasMsg = cinemsDataToMsg(cinemasData);
+    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+  }
+
+  //TODO
+  public async onPhotosCmd(chatId: TGChatId, text: string) {
+    const cinemasData = await this.getCachedCinemasData();
+    log.trace(cinemasData);
+    const cinemasMsg = cinemsDataToMsg(cinemasData);
+    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+  }
+
+  //TODO
+  public async onInfoCmd(chatId: TGChatId, text: string) {
+    const cinemasData = await this.getCachedCinemasData();
+    log.trace(cinemasData);
+    const cinemasMsg = cinemsDataToMsg(cinemasData);
+    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+  }
+
+  //TODO
+  public async onScheduleGenreCmd(chatId: TGChatId) {
     const cinemasData = await this.getCachedCinemasData();
     log.trace(cinemasData);
     const cinemasMsg = cinemsDataToMsg(cinemasData);
@@ -137,7 +168,8 @@ export default class CinemaBot {
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
-  public async onActorsCmd(chatId: TGChatId) {
+  //TODO
+  public async onActorsCmd(chatId: TGChatId, text: string) {
     const actorsData = await this.getCachedCinemasData();
     log.trace(actorsData);
     const cinemasMsg = theatresDataToListMsg(actorsData);

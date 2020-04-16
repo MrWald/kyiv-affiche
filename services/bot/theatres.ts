@@ -90,6 +90,7 @@ interface IMoviesMsg {
   msg: string;
 }
 
+//TODO
 export const cinemsDataToMsg = (cinemas: ITheatre[]): string => {
   const titles = moviesListFromCinemasData(cinemas);
   const moviesMsg: IMoviesMsg[] = [];
