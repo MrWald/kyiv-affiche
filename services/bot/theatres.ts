@@ -222,4 +222,6 @@ const getWorkers = async (theatre_id: number): Promise<string[]> => {
   for(const worker of res)
     data.push(worker.name+" "+worker.surname+" "+worker.patronymic);
   return data;
+
+
 }
