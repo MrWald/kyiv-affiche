@@ -104,6 +104,17 @@ export const cinemsDataToMsg = (cinemas: ITheatre[]): string => {
   ), '');
 };
 
+export const theatresDataToListMsg = (theatres: ITheatre[]): string => {
+  const theatresMsg: string[] = [];
+  for (const theatre of theatres) {
+    const msg = theatre.name+'\n';
+    theatresMsg.push(msg);
+  }
+  return reduce(theatresMsg, (memo, msg) => (
+    memo ? `${memo}${RN2}${msg}` : msg
+  ), '');
+};
+
 const getMovieMsg = (title: string, cinemas: ITheatre[]): string | null => {
   if (!title) { return null; }
   let str = `Вистава: *${title}*`;
