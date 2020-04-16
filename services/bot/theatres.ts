@@ -1,7 +1,8 @@
-import { reduce, sortBy, uniq } from 'lodash';
+import {reduce, sortBy, uniq} from 'lodash';
 import moment from 'moment';
-import { Log, RN, RN2 } from 'utils';
-import { ITheatre, IPerformance } from 'services/bot/types';
+import {Log, RN, RN2} from 'utils';
+import {ITheatre, IPerformance} from 'services/bot/types';
+
 const mysql = require('serverless-mysql')({
   config: {
     host: "remotemysql.com",
@@ -32,7 +33,7 @@ export const getTheatresData = async (): Promise<ITheatre[]> => {
   let temp;
   try {
     temp = await mysql.query("SELECT * FROM Theatres");
-  } catch(error) {
+  } catch (error) {
     log.err(error);
     return null;
   }
@@ -52,11 +53,11 @@ export const getTheatresData = async (): Promise<ITheatre[]> => {
         performances: await getPerformances(theatre.theatre_id),
         workers: await getWorkers(theatre.theatre_id)
       }
-      );
+    );
   }
   log.debug('getting theatres data done');
   log.trace('length=', data.length, 'cinemas=', data);
-  
+
   return data;
 };
 
@@ -107,7 +108,7 @@ export const cinemsDataToMsg = (cinemas: ITheatre[]): string => {
 export const theatresDataToListMsg = (theatres: ITheatre[]): string => {
   const theatresMsg: string[] = [];
   for (const theatre of theatres) {
-    const msg = theatre.name+'\n';
+    const msg = theatre.name + '\n';
     theatresMsg.push(msg);
   }
   return reduce(theatresMsg, (memo, msg) => (
@@ -116,22 +117,30 @@ export const theatresDataToListMsg = (theatres: ITheatre[]): string => {
 };
 
 const getMovieMsg = (title: string, cinemas: ITheatre[]): string | null => {
-  if (!title) { return null; }
+  if (!title) {
+    return null;
+  }
   let str = `Вистава: *${title}*`;
   for (const cinema of cinemas) {
     const cStr = cinemaToMovieMsg(title, cinema);
-    if (cStr) { str = `${str}${RN2}${cStr}`; }
+    if (cStr) {
+      str = `${str}${RN2}${cStr}`;
+    }
   }
   return str;
 };
 
 const cinemaToMovieMsg = (title: string, cinema: ITheatre): string | null => {
-  const { name: cTitle, performances: cMovies } = cinema;
+  const {name: cTitle, performances: cMovies} = cinema;
   const movie = cMovies.find((item) => item.name === title);
-  if (!movie) { return null; }
-  const { dates } = movie;
+  if (!movie) {
+    return null;
+  }
+  const {dates} = movie;
   const str = sessionToStr(dates);
-  if (!str) { return null; }
+  if (!str) {
+    return null;
+  }
   return `Де: ${cTitle}${RN}${str}`;
 };
 
@@ -160,13 +169,13 @@ const dateStrToTime = (val: string) => (
 // }
 
 const getPhotos = async (n_performance: number): Promise<string[]> => {
-  return await mysql.query("SELECT photo FROM Photogallery WHERE n_performance="+n_performance);
+  return await mysql.query("SELECT photo FROM Photogallery WHERE n_performance=" + n_performance);
 }
 
 const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
   let data = [];
-  const temp = await mysql.query("SELECT * FROM Performances WHERE n_theatre="+theatre_id);
-  for(const performance of temp){
+  const temp = await mysql.query("SELECT * FROM Performances WHERE n_theatre=" + theatre_id);
+  for (const performance of temp) {
     data.push({
       n_performance: performance.n_performance,
       genres: await getGenre(performance.n_performance),
@@ -188,19 +197,19 @@ const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
 }
 
 const getGenre = async (n_performance: number): Promise<string[]> => {
-  return await mysql.query("SELECT name FROM Genres WHERE Genres.n_genre=(SELECT Performances.n_genre FROM Performances WHERE n_performance="+n_performance+")");
+  return await mysql.query("SELECT name FROM Genres WHERE Genres.n_genre=(SELECT Performances.n_genre FROM Performances WHERE n_performance=" + n_performance + ")");
 }
 
 const getAuthors = async (n_performance: number): Promise<string[]> => {
   let data = [];
-  const temp = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE worker_code IN (SELECT n_author FROM Authors_Performance WHERE n_performance="+n_performance+")");
-  for(const author of temp)
-      data.push(author.surname+" "+author.name+" "+author.patronymic);
+  const temp = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE worker_code IN (SELECT n_author FROM Authors_Performance WHERE n_performance=" + n_performance + ")");
+  for (const author of temp)
+    data.push(author.surname + " " + author.name + " " + author.patronymic);
   return data;
 }
 
 const getDates = async (n_performance: number): Promise<string[]> => {
-  return await mysql.query("SELECT performance_start FROM Date_Time_Performance WHERE n_performance="+n_performance);
+  return await mysql.query("SELECT performance_start FROM Date_Time_Performance WHERE n_performance=" + n_performance);
 }
 
 // const getAwards = (worker_code: number): string[] => {
@@ -214,7 +223,7 @@ const getDates = async (n_performance: number): Promise<string[]> => {
 // }
 
 const getRolesP = async (n_performance: number): Promise<string[]> => {
-  return await mysql.query("SELECT name FROM Roles WHERE n_performance="+n_performance);
+  return await mysql.query("SELECT name FROM Roles WHERE n_performance=" + n_performance);
 }
 
 // const getCreations = (worker_code: number): string[] => {
@@ -230,9 +239,16 @@ const getRolesP = async (n_performance: number): Promise<string[]> => {
 const getWorkers = async (theatre_id: number): Promise<string[]> => {
   let data = [];
   const res = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE theatre_id=" + theatre_id);
-  for(const worker of res)
-    data.push(worker.name+" "+worker.surname+" "+worker.patronymic);
+  for (const worker of res)
+    data.push(worker.name + " " + worker.surname + " " + worker.patronymic);
   return data;
+}
 
-
+const getActors = async (theatre_id: number): Promise<string[]> => {
+    let data = [];
+    const res = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE title_id IN " +
+      "(SELECT title_id FROM Titles WHERE title_name='Актор') AND theatre_id=" + theatre_id);
+    for (const worker of res)
+      data.push(worker.name + " " + worker.surname + " " + worker.patronymic);
+    return data;
 }
