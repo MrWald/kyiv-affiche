@@ -1,6 +1,6 @@
 export interface IPerformance {
   n_performance: number;
-  genres: string[];
+  genre: string;
   name: string;
   actions: number;
   max_age: number;
@@ -12,6 +12,7 @@ export interface IPerformance {
   dates: string[];
   authors: string[];
   roles: string[];
+  theatre: string;
   photos?: string[];
 }
 
@@ -52,4 +53,5 @@ export interface ITheatre {
   doc_link?: string;
   performances: IPerformance[];
   workers: string[];
+  n_perf: number;
 }

@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData, theatresDataToListMsg } from 'services/bot/theatres';
+import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData, theatresDataToListMsg, getAllPerformances, findActors, getPhotos, getInfo } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -80,8 +80,6 @@ export default class CinemaBot {
         await this.onPhotosCmd(chatId, text);
       } else if (text.indexOf('/info') === 0) {
         await this.onInfoCmd(chatId, text);
-      } else if (text.indexOf('/schedule_genres') === 0) {
-        await this.onScheduleGenreCmd(chatId);
       } else {
         await this.sendMsg(chatId, sorryMsg);
       }
@@ -129,50 +127,54 @@ export default class CinemaBot {
     await this.sendMsg(chatId, helpMsg, {disable_web_page_preview: true});
   }
 
-  //TODO
+  //CHANGE
   public async onScheduleCmd(chatId: TGChatId, text: string) {
-    const cinemasData = await this.getCachedCinemasData();
-    log.trace(cinemasData);
-    const cinemasMsg = cinemsDataToMsg(cinemasData);
-    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    let cinemasData;
+    if(text === '/schedule') {
+      cinemasData = await getAllPerformances();
+      await this.sendMsg(chatId, "TEST", { parse_mode: 'Markdown', disable_web_page_preview: true });
+    }
+    else {
+      const theatre = text.substr(text.indexOf(' ')+1);
+      cinemasData = await this.getCachedCinemasData(theatre);
+      log.trace(cinemasData);
+      const cinemasMsg = cinemsDataToMsg(cinemasData);
+      await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    }
   }
 
-  //TODO
   public async onPhotosCmd(chatId: TGChatId, text: string) {
-    const cinemasData = await this.getCachedCinemasData();
+    const cinemasData = await getPhotos(text.substr(text.indexOf(' ')+1));
     log.trace(cinemasData);
-    const cinemasMsg = cinemsDataToMsg(cinemasData);
-    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    const message = [];
+    for(const url of cinemasData){
+      message.push({
+        type: "photo",
+        media: url,
+      });
+    }
+    await this.sendPhoto(chatId, message, { parse_mode: 'Markdown', disable_web_page_preview: false });
   }
 
-  //TODO
   public async onInfoCmd(chatId: TGChatId, text: string) {
-    const cinemasData = await this.getCachedCinemasData();
+    const cinemasData = await getInfo(text.substr(text.indexOf(' ')+1));
+    log.debug(text);
     log.trace(cinemasData);
-    const cinemasMsg = cinemsDataToMsg(cinemasData);
-    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
-  }
-
-  //TODO
-  public async onScheduleGenreCmd(chatId: TGChatId) {
-    const cinemasData = await this.getCachedCinemasData();
-    log.trace(cinemasData);
-    const cinemasMsg = cinemsDataToMsg(cinemasData);
-    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    await this.sendMsg(chatId, cinemasData, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
   public async onTheatresCmd(chatId: TGChatId) {
-    const cinemasData = await this.getCachedCinemasData();
+    const cinemasData = await this.getCachedCinemasData(null);
     log.trace(cinemasData);
     const cinemasMsg = theatresDataToListMsg(cinemasData);
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
-  //TODO
   public async onActorsCmd(chatId: TGChatId, text: string) {
-    const actorsData = await this.getCachedCinemasData();
+    log.debug(text.substr(text.indexOf(' ')+1));
+    const actorsData = await findActors(text.substr(text.indexOf(' ')+1));
     log.trace(actorsData);
-    const cinemasMsg = theatresDataToListMsg(actorsData);
+    const cinemasMsg = actorsData.join("\n");
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
@@ -210,7 +212,7 @@ export default class CinemaBot {
 
   public async onCheckForNewMovies() {
     log.debug('checking for new plays');
-    const cinemasData = await this.getCachedCinemasData();
+    const cinemasData = await this.getCachedCinemasData(null);
     const movies = moviesListFromCinemasData(cinemasData);
     const notNotifiedMovies = await filterNotNotifiedMovies(movies);
     if (notNotifiedMovies.length) {
@@ -232,20 +234,31 @@ export default class CinemaBot {
     await this.tgbot.sendTextMessage(chatId, msg, opt);
   }
 
+  public async sendPhoto(chatId: TGChatId, msg, opt?: ITGSendMessageReducedOpt) {
+    await this.tgbot.sendPhotoMessage(chatId, msg, opt);
+  }
+
   // Data
 
-  public async getCachedCinemasData() {
+  public async getCachedCinemasData(theatreName: string) {
     if (!this.cacheEnabled) {
       log.debug(`cache disabled, loading theatres data from api`);
-      return getTheatresData();
+      return getTheatresData(theatreName);
     }
     const cachedData = await getCache(ScheduleCacheKey);
     if (cachedData && isArray(cachedData) && cachedData.length) {
       log.debug(`loading theatres data from cache`);
-      return cachedData;
+      if(!theatreName)
+        return cachedData;
+      else {
+        for(const theatre of cachedData) {
+          if(theatre.name === theatreName)
+            return theatre;
+        }
+      }
     }
     log.debug(`loading theatres data from api`);
-    const data = await getTheatresData();
+    const data = await getTheatresData(null);
     log.debug(`saving data to cache`);
     setCache(ScheduleCacheKey, data, ScheduleCacheExp);
     return data;

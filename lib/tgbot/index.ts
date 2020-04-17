@@ -46,8 +46,18 @@ export default class TelegramBot {
     return this.sendMessage(data);
   }
 
+  public async sendPhotoMessage(chat_id: number | string, media, opt?: ITGSendMessageReducedOpt) {
+    if (!chat_id) { throw new Error('chat_id required'); }
+    const data = opt ? { chat_id, media, ...opt } : { chat_id, media };
+    return this.sendPhoto(data);
+  }
+
   public async sendMessage(data: ITGSendMessageOpt) {
     return this.apiReq({ method: 'sendMessage', data });
+  }
+
+  public async sendPhoto(data) {
+    return this.apiReq({ method: "sendMediaGroup", data });
   }
 
   public async apiReq({ method, data }: { method: string, data?: any }) {
