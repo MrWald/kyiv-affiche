@@ -14,6 +14,7 @@ export interface IPerformance {
   roles: string[];
   theatre: string;
   photos?: string[];
+  theatres: string[];
 }
 
 export interface IWorker {

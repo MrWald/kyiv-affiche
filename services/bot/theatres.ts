@@ -12,48 +12,40 @@ const mysql = require('serverless-mysql')({
     database: "7a9EKOagJL"
   }
 });
-//import util from 'util';
-
 const log = Log('theatres.theatres');
 
-//const con = mysql.createConnection();
-
-//const conn = util.promisify(con.connect).bind(con);
-//const query = util.promisify(con.query).bind(con);
 
 export const getTheatresData = async (theatreName: string): Promise<ITheatre[]> => {
-  // try{
-  //   await conn();
-  // } catch(error){
-  //   log.err(error);
-  //   return null;
-  // }
   log.debug('getting theatres data');
   let data = [];
   let temp, temp2;
   try {
     if(theatreName)
-      temp = await mysql.query("SELECT * FROM Theatres WHERE `name`=\'"+theatreName+"\'");
+      temp = await mysql.query('SELECT * FROM Theatres WHERE `name`="'+theatreName+'"');
     else{
       temp = await mysql.query("SELECT theatre_id, `name` FROM Theatres");
       temp2 = await mysql.query("SELECT n_theatre, COUNT(n_performance) FROM Performances GROUP BY n_theatre");
-      log.debug("KEYS OF GROUP BY ELEMENT " + Object.keys(temp2[0]));
     }
   } catch (error) {
     log.err(error);
     return null;
   }
-  for (const theatre of temp) {
-    data.push(
-      {
-        name: theatre.name,
-        n_perf: temp2.find((element) => element.n_theatre===theatre.theatre_id)["COUNT(n_performance)"]
-      }
-    );
+  if(theatreName) {
+    data.push({
+      name: temp[0].name,
+      performances: await getPerformances(temp[0].theatre_id)
+    });
+  } else {
+    for (const theatre of temp) {
+      data.push(
+        {
+          name: theatre.name,
+          n_perf: temp2.find((element) => element.n_theatre===theatre.theatre_id)["COUNT(n_performance)"]
+        }
+      );
+    }
   }
   log.debug('getting theatres data done');
-  log.trace('length=', data.length, 'cinemas=', data);
-
   return data;
 };
 
@@ -156,26 +148,20 @@ const dateStrToTime = (val: string) => (
   moment(val).format('HH:mm')
 );
 
-// const getTitle = (title_id: number): string => {
-//   let data;
-//   con.query("SELECT 7a9EKOagJL.Titles.title_name FROM 7a9EKOagJL.Titles WHERE 7a9EKOagJL.Titles.title_id="+title_id+";", (err, res) => {
-//     if(err)
-//       throw err;
-//     data = res;
-//   });
-//   return data;
-// }
+const dateStrToShortDate = (val: string) => (
+  moment(val).format('DD-MM HH:mm')
+);
 
 export const getPhotos = async (name: string): Promise<string[]> => {
   let perf = true;
-  let source = await mysql.query("SELECT n_performance FROM Performances WHERE `name`='"+name+"'");
+  let source = await mysql.query('SELECT n_performance FROM Performances WHERE `name`="'+name+'"');
   if(source.length === 0){
     const temp = name.split(" ");
-    source = await mysql.query("SELECT worker_code FROM Workers WHERE `name`='"+temp[1]+"' AND surname='"+temp[0]+"' AND is_author=0");
+    source = await mysql.query("SELECT worker_code FROM Workers WHERE `name`=\""+temp[1]+"\" AND surname=\""+temp[0]+"\" AND is_author=0");
     perf = false;
   }
   const data = [];
-  const qP = perf ? "n_performance="+source[0].n_performance : "n_photo IN (SELECT Photogallery.n_photo FROM Photogallery_Actors WHERE n_actor="+source[0].worker_code+")";
+  const qP = perf ? "n_performance="+source[0].n_performance : "n_photo IN (SELECT Photogallery_Actors.n_photo FROM Photogallery_Actors WHERE n_actor="+source[0].worker_code+")";
   const res = await mysql.query("SELECT photo FROM Photogallery WHERE " + qP);
   for(const photo of res){
     data.push(photo.photo);
@@ -186,14 +172,14 @@ export const getPhotos = async (name: string): Promise<string[]> => {
  export const getInfo = async (name: string): Promise<string> => {
    let data;
    let type = 1;
-   let source = await mysql.query("SELECT * FROM Performances WHERE `name`='"+name+"'");
+   let source = await mysql.query("SELECT * FROM Performances WHERE `name`=\""+name+"\"");
    if(source.length===0){
      type=0;
-     source = await mysql.query("SELECT * FROM Theatres WHERE `name`='"+name+"'");
+     source = await mysql.query("SELECT * FROM Theatres WHERE `name`=\""+name+"\"");
      if(source.length===0){
        type=2;
        const temp = name.split(" ");
-       source = await mysql.query("SELECT * FROM Workers WHERE `name`='"+temp[1]+"' AND surname='"+temp[0]+"'");
+       source = await mysql.query("SELECT * FROM Workers WHERE `name`=\""+temp[1]+"\" AND surname=\""+temp[0]+"\"");
      }
    }
    const item = source[0];
@@ -220,7 +206,7 @@ export const getPhotos = async (name: string): Promise<string[]> => {
         `Жанр: ${await getGenre(item.n_genre)}${RN}`+
         `Дати проведення: ${(await getDates(item.n_performance)).join("; ")}${RN}`+
         `Театр: ${await getTheatre(item.n_theatre)}${RN}`+
-        `Ролі: ${(await getRolesP(item.n_performance)).join("; ")}`;
+        `Ролі: ${(await getRoles(item.n_performance)).join("; ")}`;
         break;
       //Artist
       case 2:
@@ -234,53 +220,57 @@ export const getPhotos = async (name: string): Promise<string[]> => {
  }
 
 export const getAllPerformances = async (): Promise<IPerformance[]> => {
-  const temp2 = await mysql.query("SELECT name, AVG(max_price), AVG(min_price),  FROM Performances GROUP BY name");
-  log.debug(Object.keys(temp2[0]));
+  const temp2 = await mysql.query("SELECT name, MAX(max_price), MIN(min_price) FROM Performances GROUP BY name");
   const temp = await mysql.query("SELECT * FROM Performances");
   const data = [];
+  const added = [];
   for(const performance of temp){
-    data.push({
-      genre: await getGenre(performance.n_genre),
-      name: performance.name,
-      actions: performance.actions,
-      max_price: temp2.find((element) => element.name === performance.name).max_price,
-      min_price: temp2.find((element) => element.name === performance.name).min_price,
-      dates: await getDates(performance.n_performance),
-      roles: await getRolesP(performance.n_performance),
-      theatre: await getTheatre(performance.n_theatre)
-    });
+    if(added.findIndex((element) => element === performance.name) === -1){
+      data.push({
+        genre: await getGenre(performance.n_genre),
+        name: performance.name,
+        max_age: performance.max_age,
+        max_price: temp2.find((element) => element.name === performance.name)["MAX(max_price)"],
+        min_price: temp2.find((element) => element.name === performance.name)["MIN(min_price)"],
+        dates: await getDatesByName(performance.name),
+        theatres: await getTheatres(performance.name)
+      });
+      added.push(performance.name);
+    }
   }
   return data;
 }
 
-const getTheatre = async (n_theatre: number): Promise<string> => {
-  const temp = await mysql.query("SELECT name FROM Theatres WHERE theatre_id="+n_theatre);
+const getTheatres = async (name: string): Promise<string[]> => {
+  log.debug("GETTING THEATRES!");
+  const temp = await mysql.query("SELECT `name` FROM Theatres WHERE theatre_id IN (SELECT n_theatre FROM Performances WHERE Performances.`name`=\""+name+"\")");
+  const data = [];
+  for(const theatre of temp){
+    data.push(theatre.name);
+  }
+  log.debug("GOT THEATRES!");
+  return data;
+}
+
+const getTheatre = async (theatre_id: number): Promise<string> => {
+  const temp = await mysql.query("SELECT name FROM Theatres WHERE theatre_id="+theatre_id);
   return temp[0].name;
 }
 
-// const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
-//   let data = [];
-//   const temp = await mysql.query("SELECT * FROM Performances WHERE n_theatre=" + theatre_id);
-//   for (const performance of temp) {
-//     data.push({
-//       n_performance: performance.n_performance,
-//       genre: await getGenre(performance.n_genre),
-//       name: performance.name,
-//       actions: performance.actions,
-//       max_age: performance.max_age,
-//       language: performance.language,
-//       max_price: performance.max_price,
-//       min_price: performance.min_price,
-//       duration: performance.duration,
-//       based_on: performance.based_on,
-//       dates: await getDates(performance.n_performance),
-//       authors: await getAuthors(performance.n_performance),
-//       roles: await getRolesP(performance.n_performance),
-//       photos: await getPhotos(performance.n_performance)
-//     });
-//   }
-//   return data;
-// }
+const getPerformances = async (theatre_id: number): Promise<IPerformance[]> => {
+  let data = [];
+  const temp = await mysql.query("SELECT * FROM Performances WHERE n_theatre=" + theatre_id);
+  for (const performance of temp) {
+    data.push({
+      name: performance.name,
+      max_age: performance.max_age,
+      max_price: performance.max_price,
+      min_price: performance.min_price,
+      dates: await getDates(performance.n_performance)
+    });
+  }
+  return data;
+}
 
 const getGenre = async (n_genre: number): Promise<string> => {
   const genre = await mysql.query("SELECT name FROM Genres WHERE Genres.n_genre="+n_genre);
@@ -300,22 +290,23 @@ const getDates = async (n_performance: number): Promise<string[]> => {
   const temp = await mysql.query("SELECT performance_start FROM Date_Time_Performance WHERE n_performance=" + n_performance);
   const data = [];
   for(const date of temp){
-    data.push(date.performance_start);
+    data.push(dateStrToShortDate(date.performance_start));
   }
   return data;
 }
 
-// const getAwards = (worker_code: number): string[] => {
-//   let data;
-//   con.query("SELECT 7a9EKOagJL.Awards.name FROM 7a9EKOagJL.Awards WHERE 7a9EKOagJL.Awards.worker_n="+worker_code+";", (err, res) => {
-//     if(err)
-//       throw err;
-//     data = res;
-//   });
-//   return data;
-// }
+const getDatesByName = async (name: string): Promise<string[]> => {
+  log.debug("GETTING DATES BY NAME!");
+  const temp = await mysql.query("SELECT performance_start FROM Date_Time_Performance WHERE n_performance IN (SELECT Performances.n_performance FROM Performances WHERE `name`=\"" + name+"\")");
+  const data = [];
+  for(const date of temp){
+    data.push(dateStrToShortDate(date.performance_start));
+  }
+  log.debug("GOT DATES BY NAME!");
+  return data;
+}
 
-const getRolesP = async (n_performance: number): Promise<string[]> => {
+const getRoles = async (n_performance: number): Promise<string[]> => {
   const temp = await mysql.query("SELECT name FROM Roles WHERE n_performance=" + n_performance);
   const data = [];
   for(const role of temp) {
@@ -324,39 +315,12 @@ const getRolesP = async (n_performance: number): Promise<string[]> => {
   return data;
 }
 
-// const getCreations = (worker_code: number): string[] => {
-//   let data;
-//   con.query("SELECT 7a9EKOagJL.Performances.name FROM 7a9EKOagJL.Performances WHERE 7a9EKOagJL.Performances.n_performance IN (SELECT 7a9EKOagJL.Authors_Performance.n_performance FROM 7a9EKOagJL.Authors_Performance WHERE 7a9EKOagJL.Authors_Performance.n_author="+worker_code+");", (err, res) => {
-//     if(err)
-//       throw err;
-//     data = res;
-//   });
-//   return data;
-// }
-
-// const getWorkers = async (theatre_id: number): Promise<string[]> => {
-//   let data = [];
-//   const res = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE theatre_id=" + theatre_id);
-//   for (const worker of res)
-//     data.push(worker.name + " " + worker.surname + " " + worker.patronymic);
-//   return data;
-// }
-
-// const getActors = async (theatre_id: number): Promise<string[]> => {
-//     let data = [];
-//     const res = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE title_id IN " +
-//       "(SELECT title_id FROM Titles WHERE title_name='Актор') AND theatre_id=" + theatre_id);
-//     for (const worker of res)
-//       data.push(worker.name + " " + worker.surname + " " + worker.patronymic);
-//     return data;
-// }
-
 export const findActors = async (name: string): Promise<string[]> => {
   let data = [];
   let theatre = true;
-  let source = await mysql.query("SELECT theatre_id FROM Theatres WHERE `name`='"+name+"'");
+  let source = await mysql.query("SELECT theatre_id FROM Theatres WHERE `name`=\""+name+"\"");
   if(source.length === 0){
-    source = await mysql.query("SELECT n_performance FROM Performances WHERE `name`='"+name+"'");
+    source = await mysql.query("SELECT n_performance FROM Performances WHERE `name`=\""+name+"\"");
     theatre = false;
   }
   const qP = theatre ? "theatre_id="+source[0].theatre_id : "worker_code IN (SELECT n_actor FROM Roles_Actors WHERE n_role IN (SELECT Roles.n_role FROM Roles WHERE n_performance="+source[0].n_performance+"))";

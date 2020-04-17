@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { cinemsDataToMsg, getTheatresData, moviesListFromCinemasData, theatresDataToListMsg, getAllPerformances, findActors, getPhotos, getInfo } from 'services/bot/theatres';
+import { getTheatresData, theatresDataToListMsg, getAllPerformances, findActors, getPhotos, getInfo } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -127,18 +127,35 @@ export default class CinemaBot {
     await this.sendMsg(chatId, helpMsg, {disable_web_page_preview: true});
   }
 
-  //CHANGE
   public async onScheduleCmd(chatId: TGChatId, text: string) {
     let cinemasData;
     if(text === '/schedule') {
       cinemasData = await getAllPerformances();
-      await this.sendMsg(chatId, "TEST", { parse_mode: 'Markdown', disable_web_page_preview: true });
+      let response = "";
+      for(const performance of cinemasData){
+        response += 
+          `${performance.name}:\n`+
+          `\t${performance.genre}\n`+
+          `\t${performance.theatres.join(", ")}\n`+
+          `\t${performance.max_age}+\n`+
+          `\t${performance.max_price} - ${performance.min_price} грн\n`+
+          `\t${performance.dates.join(", ")}\n\n`;
+      }
+      await this.sendMsg(chatId, response, { parse_mode: 'Markdown', disable_web_page_preview: true });
     }
     else {
       const theatre = text.substr(text.indexOf(' ')+1);
       cinemasData = await this.getCachedCinemasData(theatre);
       log.trace(cinemasData);
-      const cinemasMsg = cinemsDataToMsg(cinemasData);
+      let performancePart = "";
+      for(const performance of cinemasData[0].performances){
+        performancePart += 
+          `\t${performance.name}:\n`+
+          `\t\t${performance.max_age}\n`+
+          `\t\t${performance.max_price} - ${performance.min_price} грн\n`+
+          `\t\t${performance.dates.join(", ")}\n\n`;
+      }
+      const cinemasMsg = `${cinemasData[0].name}:\n\t${performancePart}`;
       await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
     }
   }
@@ -212,8 +229,11 @@ export default class CinemaBot {
 
   public async onCheckForNewMovies() {
     log.debug('checking for new plays');
-    const cinemasData = await this.getCachedCinemasData(null);
-    const movies = moviesListFromCinemasData(cinemasData);
+    const cinemasData = await getAllPerformances();
+    const movies = [];
+    for(const performance of cinemasData){
+      movies.push(performance.name);
+    }
     const notNotifiedMovies = await filterNotNotifiedMovies(movies);
     if (notNotifiedMovies.length) {
       let msg = ``;
