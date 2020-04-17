@@ -223,6 +223,24 @@ export const getPhotos = async (name: string): Promise<string[]> => {
     return data;
  }
 
+export const getAuthorsByName = async (name: string): Promise<string[]> => {
+  let data = [];
+  let theatre = true;
+  let source = await mysql.query("SELECT theatre_id FROM Theatres WHERE `name`=\""+name+"\"");
+  if(source.length === 0){
+    source = await mysql.query("SELECT n_performance FROM Performances WHERE `name`=\""+name+"\"");
+    theatre = false;
+    if(source.length === 0)
+      return data;
+  }
+  const qP = theatre ? "theatre_id="+source[0].theatre_id : "worker_code IN (SELECT n_author FROM Authors_Performance WHERE n_performance="+source[0].n_performance+")";
+  const res = await mysql.query("SELECT `name`, surname FROM Workers WHERE " + qP + " AND is_author=1");
+  for(const actor of res){
+    data.push(actor.surname+" "+actor.name);
+  }
+  return data;
+}
+
 export const getAllPerformances = async (): Promise<IPerformance[]> => {
   const temp2 = await mysql.query("SELECT name, MAX(max_price), MIN(min_price) FROM Performances GROUP BY name");
   const temp = await mysql.query("SELECT * FROM Performances");

@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, getPhotos, getInfo } from 'services/bot/theatres';
+import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, getPhotos, getInfo, getAuthorsByName } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -82,6 +82,9 @@ export default class CinemaBot {
       } else if (text.indexOf('/info') === 0) {
         await this.onInfoCmd(chatId, text);
         logEvent(EStatsEvent.Info);
+      } else if (text.indexOf('/authors') === 0) {
+        await this.onAuthorsCmd(chatId, text);
+        logEvent(EStatsEvent.Authors);
       } else {
         await this.sendMsg(chatId, sorryMsg);
       }
@@ -205,7 +208,17 @@ export default class CinemaBot {
   }
 
   public async onActorsCmd(chatId: TGChatId, text: string) {
-    log.debug(text.substr(text.indexOf(' ')+1));
+    const actorsData = await getAuthorsByName(text.substr(text.indexOf(' ')+1));
+    log.trace(actorsData);
+    if(actorsData.length === 0)
+      await this.sendMsg(chatId, "Відсутній перелік авторів. Перевірте правильність введених даних.", { parse_mode: 'Markdown', disable_web_page_preview: true });
+    else {
+      const cinemasMsg = actorsData.join("\n");
+      await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    }
+  }
+
+  public async onAuthorsCmd(chatId: TGChatId, text: string) {
     const actorsData = await getActors(text.substr(text.indexOf(' ')+1));
     log.trace(actorsData);
     if(actorsData.length === 0)

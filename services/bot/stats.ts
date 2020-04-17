@@ -15,7 +15,8 @@ export enum EStatsEvent {
   Subscribe = 'subscribe',
   Unsubscribe = 'unsubscribe',
   Photos = 'photos',
-  Info = 'info'
+  Info = 'info',
+  Authors = 'authors'
 }
 
 const periodToResolution = (period) => {
