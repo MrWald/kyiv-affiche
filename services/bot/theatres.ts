@@ -159,6 +159,8 @@ export const getPhotos = async (name: string): Promise<string[]> => {
     const temp = name.split(" ");
     source = await mysql.query("SELECT worker_code FROM Workers WHERE `name`=\""+temp[1]+"\" AND surname=\""+temp[0]+"\" AND is_author=0");
     perf = false;
+    if(source.length === 0)
+      return [];
   }
   const data = [];
   const qP = perf ? "n_performance="+source[0].n_performance : "n_photo IN (SELECT Photogallery_Actors.n_photo FROM Photogallery_Actors WHERE n_actor="+source[0].worker_code+")";
@@ -180,6 +182,8 @@ export const getPhotos = async (name: string): Promise<string[]> => {
        type=2;
        const temp = name.split(" ");
        source = await mysql.query("SELECT * FROM Workers WHERE `name`=\""+temp[1]+"\" AND surname=\""+temp[0]+"\"");
+       if(source.length === 0)
+        return "";
      }
    }
    const item = source[0];
@@ -315,13 +319,15 @@ const getRoles = async (n_performance: number): Promise<string[]> => {
   return data;
 }
 
-export const findActors = async (name: string): Promise<string[]> => {
+export const getActors = async (name: string): Promise<string[]> => {
   let data = [];
   let theatre = true;
   let source = await mysql.query("SELECT theatre_id FROM Theatres WHERE `name`=\""+name+"\"");
   if(source.length === 0){
     source = await mysql.query("SELECT n_performance FROM Performances WHERE `name`=\""+name+"\"");
     theatre = false;
+    if(source.length === 0)
+      return data;
   }
   const qP = theatre ? "theatre_id="+source[0].theatre_id : "worker_code IN (SELECT n_actor FROM Roles_Actors WHERE n_role IN (SELECT Roles.n_role FROM Roles WHERE n_performance="+source[0].n_performance+"))";
   const res = await mysql.query("SELECT `name`, surname FROM Workers WHERE " + qP + " AND is_author=0");

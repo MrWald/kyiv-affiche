@@ -6,11 +6,11 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { getTheatresData, theatresDataToListMsg, getAllPerformances, findActors, getPhotos, getInfo } from 'services/bot/theatres';
+import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, getPhotos, getInfo } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
-  serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg,
+  serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg, helpAdminMsg
 } from 'services/bot/msg';
 import { EStatsEvent, logEvent, statsMsgForPeriod } from 'services/bot/stats';
 const log = Log('theatres.bot');
@@ -57,7 +57,7 @@ export default class CinemaBot {
         logEvent(EStatsEvent.Help);
       } else if (text.indexOf('/schedule') === 0) {
         await this.onScheduleCmd(chatId, text);
-        logEvent(EStatsEvent.Get);
+        logEvent(EStatsEvent.Schedule);
       } else if (text.indexOf('/theatres') === 0) {
         await this.onTheatresCmd(chatId);
         logEvent(EStatsEvent.Theatres);
@@ -78,8 +78,10 @@ export default class CinemaBot {
         await this.onLogoutCmd(chatId);
       } else if (text.indexOf('/photos') === 0) {
         await this.onPhotosCmd(chatId, text);
+        logEvent(EStatsEvent.Photos);
       } else if (text.indexOf('/info') === 0) {
         await this.onInfoCmd(chatId, text);
+        logEvent(EStatsEvent.Info);
       } else {
         await this.sendMsg(chatId, sorryMsg);
       }
@@ -124,7 +126,7 @@ export default class CinemaBot {
   }
 
   public async onHelpCmd(chatId: TGChatId) {
-    await this.sendMsg(chatId, helpMsg, {disable_web_page_preview: true});
+    await isAdmin(chatId) ? await this.sendMsg(chatId, helpAdminMsg, {disable_web_page_preview: true}) : await this.sendMsg(chatId, helpMsg, {disable_web_page_preview: true});
   }
 
   public async onScheduleCmd(chatId: TGChatId, text: string) {
@@ -147,37 +149,52 @@ export default class CinemaBot {
       const theatre = text.substr(text.indexOf(' ')+1);
       cinemasData = await this.getCachedCinemasData(theatre);
       log.trace(cinemasData);
-      let performancePart = "";
-      for(const performance of cinemasData[0].performances){
-        performancePart += 
-          `\t${performance.name}:\n`+
-          `\t\t${performance.max_age}\n`+
-          `\t\t${performance.max_price} - ${performance.min_price} грн\n`+
-          `\t\t${performance.dates.join(", ")}\n\n`;
+      if(cinemasData.length===0)
+        await this.sendMsg(chatId, "Не вдалось знайти театр з такою назвою. Перевірте правильність введеної назви", { parse_mode: 'Markdown', disable_web_page_preview: true });
+      else{
+        let performancePart = "";
+        if(cinemasData[0].performances.length===0)
+          performancePart = "\tПусто";
+        else{
+          for(const performance of cinemasData[0].performances){
+            performancePart += 
+              `\t${performance.name}:\n`+
+              `\t\t${performance.max_age}\n`+
+              `\t\t${performance.max_price} - ${performance.min_price} грн\n`+
+              `\t\t${performance.dates.join(", ")}\n\n`;
+          }
+        }
+        const cinemasMsg = `${cinemasData[0].name}:\n${performancePart}`;
+        await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
       }
-      const cinemasMsg = `${cinemasData[0].name}:\n\t${performancePart}`;
-      await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
     }
   }
 
   public async onPhotosCmd(chatId: TGChatId, text: string) {
     const cinemasData = await getPhotos(text.substr(text.indexOf(' ')+1));
     log.trace(cinemasData);
-    const message = [];
-    for(const url of cinemasData){
-      message.push({
-        type: "photo",
-        media: url,
-      });
+    if(cinemasData.length === 0)
+      await this.sendMsg(chatId, "Не вдалось знайти фото. Перевірте правильність введених даних.", { parse_mode: 'Markdown', disable_web_page_preview: false });
+    else {
+      const message = [];
+      for(const url of cinemasData){
+        message.push({
+          type: "photo",
+          media: url,
+        });
+      }
+      await this.sendPhoto(chatId, message, { parse_mode: 'Markdown', disable_web_page_preview: false });
     }
-    await this.sendPhoto(chatId, message, { parse_mode: 'Markdown', disable_web_page_preview: false });
   }
 
   public async onInfoCmd(chatId: TGChatId, text: string) {
     const cinemasData = await getInfo(text.substr(text.indexOf(' ')+1));
-    log.debug(text);
-    log.trace(cinemasData);
-    await this.sendMsg(chatId, cinemasData, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    if(cinemasData === "")
+      await this.sendMsg(chatId, "Не вдалось знайти інформацію. Перевірте правильність введених даних.", { parse_mode: 'Markdown', disable_web_page_preview: false });
+    else {
+      log.trace(cinemasData);
+      await this.sendMsg(chatId, cinemasData, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    }
   }
 
   public async onTheatresCmd(chatId: TGChatId) {
@@ -189,10 +206,14 @@ export default class CinemaBot {
 
   public async onActorsCmd(chatId: TGChatId, text: string) {
     log.debug(text.substr(text.indexOf(' ')+1));
-    const actorsData = await findActors(text.substr(text.indexOf(' ')+1));
+    const actorsData = await getActors(text.substr(text.indexOf(' ')+1));
     log.trace(actorsData);
-    const cinemasMsg = actorsData.join("\n");
-    await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    if(actorsData.length === 0)
+      await this.sendMsg(chatId, "Відсутній перелік акторів. Перевірте правильність введених даних.", { parse_mode: 'Markdown', disable_web_page_preview: true });
+    else {
+      const cinemasMsg = actorsData.join("\n");
+      await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
+    }
   }
 
   // Subscriptions

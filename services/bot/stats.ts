@@ -7,13 +7,15 @@ const rootKey = `${projectKey}:stats`;
 const eventsKey = `${rootKey}:events`;
 
 export enum EStatsEvent {
-  Get = 'get',
+  Schedule = 'schedule',
   Help = 'help',
   Start = 'start',
   Theatres = 'theatres',
   Actors = 'actors',
   Subscribe = 'subscribe',
   Unsubscribe = 'unsubscribe',
+  Photos = 'photos',
+  Info = 'info'
 }
 
 const periodToResolution = (period) => {
@@ -41,7 +43,7 @@ export const statsMsgForPeriod = async (period) => {
   const end = new Date();
   const start = moment(end).subtract(1, period).toDate();
   const resolution = periodToResolution(period);
-  const data = await getEventStatsForPeriod(EStatsEvent.Get, start, end, resolution);
+  const data = await getEventStatsForPeriod(EStatsEvent.Schedule, start, end, resolution);
   return statsDataToMsg(start, end, data);
 };
 

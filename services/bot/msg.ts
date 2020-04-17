@@ -1,16 +1,28 @@
 // tslint:disable: max-line-length
 export const commandsText = `
-/schedule - розклад вистав
-/theatres - інформація про театри
-/actors - інформація про акторів
+/schedule [назва театру] - розклад вистав у певному театрі або у всіх
+/theatres - перелік театрів та к-ть вистав у ньому
+/actors (назва театру | назва вистави) - перелік акторів, які працюють у певному театрі або грають у певній виставі
 /subscribe - підписатися на оновлення
 /unsubscribe - відписатися від оновлень
 /help - допомога
 `;
 
+export const adminCommandsText = `
+/notify - надіслати підписаним користувачам повідомлення
+/stats - статистика використання команд користувача
+/logout - позбутись прав адміністратора
+`;
+
 export const helpMsg = `
 Ви можете скористатися наступними командами:
 ${commandsText}
+`;
+
+export const helpAdminMsg = `
+Ви можете скористатися наступними командами:
+${commandsText}
+${adminCommandsText}
 `;
 
 export const startMsg = `
