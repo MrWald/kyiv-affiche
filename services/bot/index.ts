@@ -157,7 +157,7 @@ export default class CinemaBot {
           `\tЖанр: ${performance.genre}\n`+
           `\tДе: ${performance.theatres.join(", ")}\n`+
           `\tВік: ${performance.max_age}+\n`+
-          `\tЦіни: ${performance.max_price} - ${performance.min_price} грн\n`+
+          `\tЦіни: ${performance.min_price} - ${performance.max_price} грн\n`+
           `\tКоли: ${performance.dates.join(", ")}\n\n`;
       }
       await this.sendMsg(chatId, response, { parse_mode: 'Markdown', disable_web_page_preview: true });
@@ -177,7 +177,7 @@ export default class CinemaBot {
             performancePart += 
               `\t${performance.name}:\n`+
               `\t\tВік: ${performance.max_age}\n`+
-              `\t\tЦіни: ${performance.max_price} - ${performance.min_price} грн\n`+
+              `\t\tЦіни: ${performance.min_price} - ${performance.max_price} грн\n`+
               `\t\tКоли: ${performance.dates.join(", ")}\n\n`;
           }
         }
