@@ -302,9 +302,33 @@ const getGenre = async (n_genre: number): Promise<string> => {
 
 const getAuthors = async (n_performance: number): Promise<string[]> => {
   let data = [];
-  const temp = await mysql.query("SELECT name, surname, patronymic FROM Workers WHERE worker_code IN (SELECT n_author FROM Authors_Performance WHERE n_performance=" + n_performance + ")");
+  const temp = await mysql.query("SELECT name, surname FROM Workers WHERE worker_code IN (SELECT n_author FROM Authors_Performance WHERE n_performance=" + n_performance + ")");
   for (const author of temp)
-    data.push(author.surname + " " + author.name + " " + author.patronymic);
+    data.push(author.surname + " " + author.name);
+  return data;
+}
+
+export const getPatrons = async (name: string): Promise<string[]> => {
+  let data = [];
+  const nameS = name.split(" ");
+  const temp = await mysql.query(
+    "SELECT Authors.`name`, Authors.surname "+
+    "FROM Workers AS Authors "+
+    "WHERE Authors.is_author=1 AND NOT EXISTS ( "+
+    "SELECT * "+
+    "FROM Authors_Performance "+
+    "WHERE n_author=Authors.worker_code AND NOT EXISTS ( " + 
+    "SELECT * "+
+    "FROM Roles "+
+    "WHERE Roles.n_performance=Authors_Performance.n_performance AND Roles.n_role IN ( "+
+    "SELECT Roles_Actors.n_role "+
+    "FROM Roles_Actors "+
+    "WHERE n_actor IN ( "+
+    "SELECT worker_code "+
+    "FROM Workers AS Actors "+
+    "WHERE Actors.is_author=0 AND Actors.`name`=\"" + nameS[1] + "\" AND Actors.surname=\"" + nameS[0]+"\"))))");
+  for (const author of temp)
+    data.push(author.surname + " " + author.name);
   return data;
 }
 

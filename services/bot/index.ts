@@ -6,7 +6,7 @@ import { getCache, setCache } from 'services/cache';
 import { Log } from 'utils';
 import { adminLogin, adminLogout, isAdmin } from 'services/bot/admin';
 import { addToAllGroup, addToGroup, getNotInGroup, removeFromGroup } from 'services/bot/chatsStore';
-import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, getPhotos, getInfo, getAuthorsByName } from 'services/bot/theatres';
+import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, getPhotos, getInfo, getAuthorsByName, getPatrons } from 'services/bot/theatres';
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
@@ -85,12 +85,26 @@ export default class CinemaBot {
       } else if (text.indexOf('/authors') === 0) {
         await this.onAuthorsCmd(chatId, text);
         logEvent(EStatsEvent.Authors);
+      } else if (text.indexOf('/patrons') === 0) {
+        await this.onPatronsCmd(chatId, text);
+        logEvent(EStatsEvent.Patrons);
       } else {
         await this.sendMsg(chatId, sorryMsg);
       }
     } catch (err) {
       log.err('process text msg err, err=', err);
       await this.sendMsg(chatId, serviceErrMsg);
+    }
+  }
+
+  public async onPatronsCmd(chatId: number, text: string) {
+    const actorsData = await getPatrons(text.substr(text.indexOf(' ')+1));
+    log.trace(actorsData);
+    if(actorsData.length === 0)
+      await this.sendMsg(chatId, "Цей актор не має патронів (Можливо, ви ввели неправильно дані).", { parse_mode: 'Markdown', disable_web_page_preview: true });
+    else {
+      const cinemasMsg = actorsData.join(";\n");
+      await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
     }
   }
 
