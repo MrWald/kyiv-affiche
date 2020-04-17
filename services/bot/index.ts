@@ -207,7 +207,7 @@ export default class CinemaBot {
     await this.sendMsg(chatId, cinemasMsg, { parse_mode: 'Markdown', disable_web_page_preview: true });
   }
 
-  public async onActorsCmd(chatId: TGChatId, text: string) {
+  public async onAuthorsCmd(chatId: TGChatId, text: string) {
     const actorsData = await getAuthorsByName(text.substr(text.indexOf(' ')+1));
     log.trace(actorsData);
     if(actorsData.length === 0)
@@ -218,7 +218,7 @@ export default class CinemaBot {
     }
   }
 
-  public async onAuthorsCmd(chatId: TGChatId, text: string) {
+  public async onActorsCmd(chatId: TGChatId, text: string) {
     const actorsData = await getActors(text.substr(text.indexOf(' ')+1));
     log.trace(actorsData);
     if(actorsData.length === 0)
