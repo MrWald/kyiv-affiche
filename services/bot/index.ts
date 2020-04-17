@@ -140,11 +140,11 @@ export default class CinemaBot {
       for(const performance of cinemasData){
         response += 
           `${performance.name}:\n`+
-          `\t${performance.genre}\n`+
-          `\t${performance.theatres.join(", ")}\n`+
-          `\t${performance.max_age}+\n`+
-          `\t${performance.max_price} - ${performance.min_price} грн\n`+
-          `\t${performance.dates.join(", ")}\n\n`;
+          `\tЖанр: ${performance.genre}\n`+
+          `\tДе: ${performance.theatres.join(", ")}\n`+
+          `\tВік: ${performance.max_age}+\n`+
+          `\tЦіни: ${performance.max_price} - ${performance.min_price} грн\n`+
+          `\tКоли: ${performance.dates.join(", ")}\n\n`;
       }
       await this.sendMsg(chatId, response, { parse_mode: 'Markdown', disable_web_page_preview: true });
     }
@@ -162,9 +162,9 @@ export default class CinemaBot {
           for(const performance of cinemasData[0].performances){
             performancePart += 
               `\t${performance.name}:\n`+
-              `\t\t${performance.max_age}\n`+
-              `\t\t${performance.max_price} - ${performance.min_price} грн\n`+
-              `\t\t${performance.dates.join(", ")}\n\n`;
+              `\t\tВік: ${performance.max_age}\n`+
+              `\t\tЦіни: ${performance.max_price} - ${performance.min_price} грн\n`+
+              `\t\tКоли: ${performance.dates.join(", ")}\n\n`;
           }
         }
         const cinemasMsg = `${cinemasData[0].name}:\n${performancePart}`;
