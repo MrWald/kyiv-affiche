@@ -214,10 +214,17 @@ export const getPhotos = async (name: string): Promise<string[]> => {
         break;
       //Artist
       case 2:
+        let number;
+        if(item.is_author) {
+          number = `Створено вистав: ${(await mysql.query("SELECT n_author, COUNT(n_performance) FROM Authors_Performance WHERE n_author IN ( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name +"\" AND surname=\"" + item.surname + "\") GROUP BY n_author"))["COUNT(n_performance)"]}`;
+        } else{
+          number = `Зіграно ролей: ${(await mysql.query("SELECT n_actor, COUNT(n_role) FROM Roles_Actors WHERE n_actor IN ( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name + "\" AND surname=\"" + item.surname+"\") GROUP BY n_actor"))["COUNT(n_role)"]}`;
+        }
         data=
         `Ім'я: ${item.name}${RN}`+
         `Прізвище: ${item.surname}${RN}`+
-        `Посада : ${(await mysql.query("SELECT title_name FROM Titles WHERE title_id IN (SELECT Workers.title_id FROM Workers WHERE worker_code="+item.worker_code+")"))[0].title_name}${RN}`;
+        `Посада : ${(await mysql.query("SELECT title_name FROM Titles WHERE title_id IN (SELECT Workers.title_id FROM Workers WHERE worker_code="+item.worker_code+")"))[0].title_name}${RN}`+
+        number;
         break;
     }
     return data;
