@@ -216,14 +216,27 @@ export const getPhotos = async (name: string): Promise<string[]> => {
       case 2:
         let number;
         if(item.is_author) {
-          number = `Створено вистав: ${(await mysql.query("SELECT n_author, COUNT(n_performance) FROM Authors_Performance WHERE n_author IN ( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name +"\" AND surname=\"" + item.surname + "\") GROUP BY n_author"))["COUNT(n_performance)"]}`;
+          const temp3 = await mysql.query("SELECT n_author, COUNT(n_performance) "+
+          "FROM Authors_Performance "+
+          "WHERE n_author IN "+
+          "( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name +
+          "\" AND surname=\"" + item.surname + "\") GROUP BY n_author");
+          number = `Створено вистав: ${temp3[0]["COUNT(n_performance)"]}`;
         } else{
-          number = `Зіграно ролей: ${(await mysql.query("SELECT n_actor, COUNT(n_role) FROM Roles_Actors WHERE n_actor IN ( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name + "\" AND surname=\"" + item.surname+"\") GROUP BY n_actor"))["COUNT(n_role)"]}`;
+          const temp3 = await mysql.query("SELECT n_actor, COUNT(n_role) "+
+          "FROM Roles_Actors "+
+          "WHERE n_actor IN "+
+          "( SELECT worker_code FROM Workers WHERE `name`=\""+ item.name + 
+          "\" AND surname=\"" + item.surname+"\") GROUP BY n_actor");
+          number = `Зіграно ролей: ${temp3[0]["COUNT(n_role)"]}`;
         }
         data=
         `Ім'я: ${item.name}${RN}`+
         `Прізвище: ${item.surname}${RN}`+
-        `Посада : ${(await mysql.query("SELECT title_name FROM Titles WHERE title_id IN (SELECT Workers.title_id FROM Workers WHERE worker_code="+item.worker_code+")"))[0].title_name}${RN}`+
+        `Посада : ${(await mysql.query("SELECT title_name "+
+        "FROM Titles WHERE title_id IN "+
+        "(SELECT Workers.title_id FROM Workers "+
+        "WHERE worker_code="+item.worker_code+")"))[0].title_name}${RN}`+
         number;
         break;
     }
@@ -333,7 +346,8 @@ export const getPatrons = async (name: string): Promise<string[]> => {
     "WHERE n_actor IN ( "+
     "SELECT worker_code "+
     "FROM Workers AS Actors "+
-    "WHERE Actors.is_author=0 AND Actors.`name`=\"" + nameS[1] + "\" AND Actors.surname=\"" + nameS[0]+"\"))))");
+    "WHERE Actors.is_author=0 AND Actors.`name`=\"" + nameS[1] + 
+    "\" AND Actors.surname=\"" + nameS[0]+"\"))))");
   for (const author of temp)
     data.push(author.surname + " " + author.name);
   return data;
@@ -378,7 +392,10 @@ export const getActors = async (name: string): Promise<string[]> => {
     if(source.length === 0)
       return data;
   }
-  const qP = theatre ? "theatre_id="+source[0].theatre_id : "worker_code IN (SELECT n_actor FROM Roles_Actors WHERE n_role IN (SELECT Roles.n_role FROM Roles WHERE n_performance="+source[0].n_performance+"))";
+  const qP = theatre ? 
+  "theatre_id="+source[0].theatre_id : 
+  "worker_code IN (SELECT n_actor FROM Roles_Actors WHERE n_role IN "+
+  "(SELECT Roles.n_role FROM Roles WHERE n_performance=" + source[0].n_performance+"))";
   const res = await mysql.query("SELECT `name`, surname FROM Workers WHERE " + qP + " AND is_author=0");
   for(const actor of res){
     data.push(actor.surname+" "+actor.name);
