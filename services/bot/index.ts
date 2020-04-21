@@ -10,7 +10,7 @@ import { getTheatresData, theatresDataToListMsg, getAllPerformances, getActors, 
 import { addToNotifiedMovies, filterNotNotifiedMovies } from 'services/bot/moviesStore';
 import {
   cmdParamErr, helpMsg, loginedMsg, logoutErrMsg, logoutMsg,
-  serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg, helpAdminMsg
+  serviceErrMsg, sorryMsg, startMsg, subscribeMsg, unsubscribeMsg, helpAdminMsg, startAdminMsg
 } from 'services/bot/msg';
 import { EStatsEvent, logEvent, statsMsgForPeriod } from 'services/bot/stats';
 const log = Log('theatres.bot');
@@ -120,7 +120,7 @@ export default class CinemaBot {
       if (!isLogined) {
         await this.sendMsg(chatId, startMsg);
       } else {
-        await this.sendMsg(chatId, loginedMsg);
+        await this.sendMsg(chatId, loginedMsg + "\n" + startAdminMsg);
       }
     }
   }

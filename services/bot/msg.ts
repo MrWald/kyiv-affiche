@@ -33,6 +33,12 @@ export const startMsg = `
 ${commandsText}
 ` + `\n\n Усі побажання та зауваження надсилайте на Telegram: @ansttss`;
 
+export const startAdminMsg = `
+Вітаємо! Цей бот містить інформацію про театри міста Києва та вистави, що в них відбуваються. Пропонуємо вам скористатися наступними командами:
+${commandsText}
+${adminCommandsText}
+` + `\n\n Усі побажання та зауваження надсилайте на Telegram: @ansttss`;
+
 export const sorryMsg = `
 Вибачте, такої команди не існує. Пропонуємо вам скористатися наступними командами:
 ${commandsText}
